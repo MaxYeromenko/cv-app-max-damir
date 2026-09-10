@@ -1,0 +1,53 @@
+$round-edges: 2px;
+
+%centered-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+%rounded-no-edges {
+    border-radius: 0;
+}
+
+%rounded-all-edges {
+    border-radius: $round-edges;
+}
+
+%rounded-top-edges {
+    border-radius: $round-edges $round-edges 0 0;
+}
+
+%rounded-bottom-edges {
+    border-radius: 0 0 $round-edges $round-edges;
+}
+
+%rounded-right-edges {
+    border-radius: 0 $round-edges $round-edges 0;
+}
+
+%rounded-left-edges {
+    border-radius: $round-edges 0 0 $round-edges;
+}
+
+%scrollbar {
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: $round-edges;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--quaternary-color);
+        border-radius: $round-edges;
+        cursor: grab;
+
+        &:active {
+            cursor: grabbing;
+        }
+    }
+}

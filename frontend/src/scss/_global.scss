@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Nata+Sans:wght@100..900&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Nata Sans", sans-serif;
+    color: var(--text-color);
+    transition: all 0.2s ease;
+    outline: none;
+    scroll-behavior: smooth;
+
+    &:focus {
+        border-color: var(--quaternary-color) !important;
+        text-decoration-color: var(--quaternary-color) !important;
+    }
+}
+
+html::-webkit-scrollbar {
+    display: none;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    #root {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        background-color: var(--primary-color);
+    }
+
+    header,
+    footer {
+        width: 100%;
+        min-height: 50px;
+        background-color: var(--secondary-color);
+    }
+
+    input[type="text"],
+    input[type="range"],
+    button,
+    select {
+        padding: 0.5em;
+        min-height: 35px;
+        color: var(--text-color);
+    }
+
+    .fadedText {
+        opacity: 0.75;
+    }
+}
