@@ -1,32 +1,33 @@
 from enum import Enum
-from datetime import date
-from pydantic import BaseModel, Field, EmailStr, GetCoreSchemaHandler
-from pydantic_core import CoreSchema, core_schema
-from bson import ObjectId
+from datetime import date as dt
+from pydantic import BaseModel, Field, EmailStr
 
 
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_pydantic_core_schema__(
-        cls, source: type, handler: GetCoreSchemaHandler
-    ) -> CoreSchema:
-        return core_schema.union_schema(
-            [
-                core_schema.is_instance_schema(ObjectId),
-                core_schema.chain_schema(
-                    [
-                        core_schema.str_schema(),
-                        core_schema.no_info_plain_validator_function(cls.validate),
-                    ]
-                ),
-            ]
-        )
+USER_CV_UPDATE_ALLOWED_FIELDS = (
+      "photo",
 
-    @classmethod
-    def validate(cls, v: str) -> ObjectId:
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
-        return ObjectId(v)
+      "personal_info.first_name",
+      "personal_info.last_name",
+      "personal_info.preferred_name",
+      "personal_info.email",
+      "personal_info.phone",
+      "personal_info.date_of_birth",
+      "personal_info.nationality",
+      "personal_info.country_of_residence",
+      "personal_info.gender",
+
+      "languages",
+      "work_experience",
+      "scientific_interests",
+      "publications",
+      "awards",
+      "favorite_subjects_in_school",
+      "programming_skills",
+
+      "device_access.weekly_hours",
+
+      "hobbies",
+)
 
 
 class Gender(str, Enum):
@@ -65,6 +66,9 @@ class SchoolSubject(str, Enum):
 
 
 class UserPersonalInfo(BaseModel):
+    model_config = {
+        "extra": "forbid",
+    }
     first_name: str = Field(min_length=1, max_length=20)
     last_name: str = Field(min_length=1, max_length=20)
     preferred_name: str | None = Field(default=None, min_length=1, max_length=20)
@@ -72,67 +76,88 @@ class UserPersonalInfo(BaseModel):
     email: EmailStr
     phone: str = Field(min_length=10, max_length=15)
 
-    date_of_birth: date
+    date_of_birth: dt
     nationality: str = Field(min_length=1, max_length=20)
     country_of_residence: str = Field(min_length=1, max_length=30)
     gender: Gender
 
 
 class Language(BaseModel):
+    model_config = {
+        "extra": "forbid",
+    }
     name: str = Field(min_length=1, max_length=30)
     proficiency: ProficiencyLevel
 
 
 class Job(BaseModel):
+    model_config = {
+        "extra": "forbid",
+    }
     job_title: str = Field(min_length=1, max_length=50)
     location: str = Field(min_length=1, max_length=50)
     company: str = Field(min_length=1, max_length=50)
-    from_date: date
-    to_date: date | None = None
+    from_date: dt
+    to_date: dt | None = None
     description: str | None = Field(default=None, min_length=10, max_length=300)
 
 
 class ScientificInterest(BaseModel):
+    model_config = {
+        "extra": "forbid",
+    }
     name: str = Field(min_length=1, max_length=100)
     description: str | None = Field(default=None, min_length=10, max_length=300)
 
 
 class Publication(BaseModel):
+    model_config = {
+        "extra": "forbid",
+    }
     title: str = Field(min_length=1, max_length=200)
     journal: str | None = Field(default=None, max_length=100)
-    publication_date: date | None = None
+    publication_date: dt | None = None
     authors: list[str] = Field(default_factory=list)
     url: str | None = None
 
 
 class Award(BaseModel):
+    model_config = {
+        "extra": "forbid",
+    }
     title: str = Field(min_length=1, max_length=100)
     organization: str | None = Field(default=None, max_length=100)
-    date: date | None = None
+    date: dt | None = None
     description: str | None = Field(default=None, min_length=10, max_length=300)
 
 
 class ProgrammingSkill(BaseModel):
+    model_config = {
+        "extra": "forbid",
+    }
     language: str = Field(min_length=1, max_length=50)
     level: ProgrammingLevel
 
 
 class DeviceAccess(BaseModel):
+    model_config = {
+        "extra": "forbid",
+    }
     weekly_hours: float = Field(ge=0)
 
 
 class Hobby(BaseModel):
+    model_config = {
+        "extra": "forbid",
+    }
     name: str = Field(min_length=1, max_length=50)
 
 
-class UserCV(BaseModel):
+class UserCVRequest(BaseModel):
     model_config = {
-        "populate_by_name": True,
-        "arbitrary_types_allowed": True,
         "extra": "forbid",
     }
 
-    id: PyObjectId | None = Field(default=None, alias="_id")
     photo: str | None = None
 
     personal_info: UserPersonalInfo
@@ -145,3 +170,7 @@ class UserCV(BaseModel):
     programming_skills: list[ProgrammingSkill]
     device_access: DeviceAccess
     hobbies: list[Hobby]
+
+class UserCVResponse(UserCVRequest):
+    pass
+
