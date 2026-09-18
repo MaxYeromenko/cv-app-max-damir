@@ -1,0 +1,1 @@
+export type NullableElement = HTMLElement | null;

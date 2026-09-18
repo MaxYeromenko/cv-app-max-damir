@@ -1,0 +1,9 @@
+@use "./patterns" as *;
+
+footer {
+    flex-direction: column;
+
+    address {
+        font-style: normal;
+    }
+}
