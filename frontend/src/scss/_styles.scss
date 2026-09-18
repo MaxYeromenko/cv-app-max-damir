@@ -1,0 +1,34 @@
+@use "./patterns" as *;
+
+body {
+    @extend %centered-flex, %scrollbar;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0;
+    overflow: auto;
+
+    a {
+        text-decoration: none;
+
+        &:focus,
+        &:hover {
+            text-decoration: underline;
+        }
+
+        &.scaling {
+            text-decoration-color: var(--quaternary-color);
+
+            &:hover {
+                display: inline-block;
+                transform: scale(1.05);
+            }
+        }
+    }
+
+    header,
+    footer {
+        @extend %centered-flex;
+        gap: 5px;
+        padding: 20px;
+    }
+}

@@ -1,18 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Nata+Sans:wght@100..900&display=swap');
 
+:root {
+    font-size: 16px;
+}
+
 * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
     font-family: "Nata Sans", sans-serif;
+    font-size: 1rem;
     color: var(--text-color);
     transition: all 0.2s ease;
     outline: none;
     scroll-behavior: smooth;
 
     &:focus {
-        border-color: var(--quaternary-color) !important;
-        text-decoration-color: var(--quaternary-color) !important;
+        border-color: var(--quinary-color) !important;
+        text-decoration-color: var(--quinary-color) !important;
     }
 }
 
@@ -27,18 +32,16 @@ body {
 }
 
 body {
-    #root {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        background-color: var(--primary-color);
-    }
+    background-color: var(--primary-color);
 
     header,
     footer {
         width: 100%;
-        min-height: 50px;
         background-color: var(--secondary-color);
+    }
+
+    main {
+        flex-grow: 1;
     }
 
     input[type="text"],
@@ -48,9 +51,22 @@ body {
         padding: 0.5em;
         min-height: 35px;
         color: var(--text-color);
+        border: 1px solid var(--text-color);
+    }
+
+    a[target="_blank"]::after {
+        content: " ↗";
+        font-size: 0.85em;
+        display: inline-block;
+        margin-left: 2px;
+        opacity: 0.8;
     }
 
     .fadedText {
         opacity: 0.75;
+    }
+
+    .hidden {
+        display: none;
     }
 }
