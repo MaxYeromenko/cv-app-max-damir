@@ -1,7 +1,5 @@
-export function init(mainElement) {
-    if (!mainElement)
-        return;
-    const canvas = mainElement.querySelector("#team-canvas");
+export function init() {
+    const canvas = document.querySelector("#team-canvas");
     if (!canvas)
         return;
     const ctx = canvas.getContext("2d");
