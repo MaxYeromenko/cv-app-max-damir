@@ -31,7 +31,7 @@ __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
-backend/request_example.json
+backend/app/request_example.json
 
 # Environment variables & secrets (дуже важливо!)
 .env

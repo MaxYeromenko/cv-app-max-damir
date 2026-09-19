@@ -1,15 +1,15 @@
 import logging
 
-from backend.logging_config import setup_logging
+from app.logging_config import setup_logging
 
 setup_logging()
 
-from backend.db import cvs
+from app.db import cvs
 from bson import ObjectId
 from bson.errors import InvalidId
 from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
-from backend.schemas import UserCVRequest, UserCVResponse, USER_CV_UPDATE_ALLOWED_FIELDS
+from app.schemas import UserCVRequest, UserCVResponse, USER_CV_UPDATE_ALLOWED_FIELDS
 from typing import Any
 
 

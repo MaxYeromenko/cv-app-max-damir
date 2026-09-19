@@ -3,7 +3,7 @@ import logging.config
 import os
 from pathlib import Path
 
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).parent.parent.parent
 
 def setup_logging() -> None:
     os.makedirs(BASE_DIR / "logs", exist_ok=True)
