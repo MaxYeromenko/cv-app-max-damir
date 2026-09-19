@@ -115,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
             hobbies: hobbies
         };
         try {
-            const response = await fetch("http://localhost:8000/api/members", {
+            const response = await fetch("http://localhost:8000/api/v1/user-cv", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(requestPayload),
