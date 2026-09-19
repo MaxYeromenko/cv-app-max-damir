@@ -1,7 +1,5 @@
-export function init(footer) {
-    if (!footer)
-        return;
-    const yearElement = footer.querySelector("#current-year");
+export function init() {
+    const yearElement = document.getElementById("current-year");
     if (!yearElement)
         return;
     const currentYear = new Date().getFullYear().toString();

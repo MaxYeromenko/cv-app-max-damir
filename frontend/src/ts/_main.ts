@@ -1,9 +1,5 @@
-import type { NullableElement } from "./_types";
-
-export function init(mainElement: NullableElement): void {
-    if (!mainElement) return;
-
-    const canvas = mainElement.querySelector<HTMLCanvasElement>("#team-canvas");
+export function init(): void {
+    const canvas = document.querySelector<HTMLCanvasElement>("#team-canvas");
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");

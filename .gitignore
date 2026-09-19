@@ -43,4 +43,3 @@ Desktop.ini
 
 # TS Compiler
 frontend/watch.mjs
-frontend/tsconfig.json
