@@ -1,3 +1,4 @@
+@use "./patterns" as *;
 @import url('https://fonts.googleapis.com/css2?family=Nata+Sans:wght@100..900&display=swap');
 
 :root {
@@ -44,14 +45,21 @@ body {
         flex-grow: 1;
     }
 
-    input[type="text"],
-    input[type="range"],
-    button,
-    select {
-        padding: 0.5em;
+    input,
+    textarea,
+    select,
+    button {
+        @extend %rounded-all-edges;
+        padding: 0.75em;
         min-height: 35px;
         color: var(--text-color);
-        border: 1px solid var(--text-color);
+        background-color: var(--quinary-color);
+        border: 2px solid var(--quaternary-color);
+    }
+
+    textarea {
+        resize: vertical;
+        font-family: inherit;
     }
 
     a[target="_blank"]::after {
@@ -62,8 +70,10 @@ body {
         opacity: 0.8;
     }
 
-    .fadedText {
-        opacity: 0.75;
+    .fadedText,
+    .fadedText * {
+        opacity: 0.8;
+        font-size: 0.85rem;
     }
 
     .hidden {
