@@ -35,4 +35,23 @@ body {
     main {
         width: 100%;
     }
+
+    .cta-button {
+        @extend %rounded-all-edges;
+        display: inline-block;
+        padding: 12px 30px;
+        background-color: var(--thirdly-color);
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+        border: 2px solid var(--text-color);
+        cursor: pointer;
+
+        &:hover:not(:disabled) {
+            text-decoration: none;
+            transform: scale(1.05);
+            background-color: var(--quaternary-color);
+            color: var(--quinary-color);
+        }
+    }
 }

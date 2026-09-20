@@ -1,4 +1,7 @@
-"use strict";
+const API_URL = "http://localhost:8000/api/v1/user-cv";
+const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dukwtlvte/image/upload";
+const CLOUDINARY_PRESET = "ml_default";
+const CLOUDINARY_FOLDER = "cv-project/user-pictures";
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("add-member-form");
     const submitBtn = document.getElementById("submit-btn");
@@ -10,6 +13,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const validTlds = /\.(com|org|net|edu|gov|ua|eu|io|dev|co)$/i;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const phoneRegex = /^\+380\d{9}$/;
+    async function checkBackendHealth() {
+        try {
+            const response = await fetch(`${API_URL}?skip=0&limit=1`);
+            if (!response.ok)
+                throw new Error("Сервер повернув помилку");
+        }
+        catch (error) {
+            console.error("Бекенд недоступний:", error);
+            const errorBanner = document.createElement("div");
+            errorBanner.className = "db-error-banner";
+            errorBanner.innerHTML = "<strong>Увага!</strong> Немає зв'язку з базою даних. Збереження резюме тимчасово недоступне.";
+            form.parentNode?.insertBefore(errorBanner, form);
+            Array.from(form.elements).forEach((el) => {
+                el.disabled = true;
+            });
+        }
+    }
+    checkBackendHealth();
     function validateForm() {
         let isValid = true;
         if (!val("first-name") || !val("last-name") || !val("birth-date") || !val("nationality") || !val("country")) {
@@ -25,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         const phoneVal = phoneInput.value.trim();
         if (!phoneRegex.test(phoneVal)) {
-            phoneError.textContent = "Телефон має бути у форматі +380XXXXXXXXX.";
+            phoneError.textContent = "Формат телефону має бути +380XXXXXXXXX.";
             isValid = false;
         }
         else {
@@ -33,63 +54,23 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         submitBtn.disabled = !isValid;
     }
-    form.addEventListener("input", validateForm);
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        let photoUrl = null;
-        const photoFileInput = document.getElementById("photo-file");
-        if (photoFileInput.files && photoFileInput.files[0]) {
-            const file = photoFileInput.files[0];
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("upload_preset", "ml_default");
-            formData.append("folder", "cv-project/user-pictures");
-            try {
-                const cloudinaryResponse = await fetch("https://api.cloudinary.com/v1_1/dukwtlvte/image/upload", { method: "POST", body: formData });
-                const cloudinaryData = await cloudinaryResponse.json();
-                photoUrl = cloudinaryData.secure_url || null;
-            }
-            catch (error) {
-                console.error("Помилка завантаження фото в Cloudinary:", error);
-            }
+    async function uploadPhoto(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", CLOUDINARY_PRESET);
+        formData.append("folder", CLOUDINARY_FOLDER);
+        try {
+            const response = await fetch(CLOUDINARY_URL, { method: "POST", body: formData });
+            const data = await response.json();
+            return data.secure_url || null;
         }
-        const languages = val("lang-name") ? [{
-                name: val("lang-name"),
-                proficiency: val("lang-level")
-            }] : [];
-        const programming_skills = val("prog-lang") ? [{
-                language: val("prog-lang"),
-                level: val("prog-level")
-            }] : [];
-        const work_experience = val("job-title") ? [{
-                job_title: val("job-title"),
-                company: val("job-company") || "Unknown",
-                location: val("job-location") || "Unknown",
-                from_date: val("job-from") || val("birth-date"),
-                to_date: val("job-to") || null,
-                description: val("job-desc") || null
-            }] : [];
-        const scientific_interests = val("sci-name") ? [{
-                name: val("sci-name"),
-                description: val("sci-desc") || null
-            }] : [];
-        const publications = val("pub-title") ? [{
-                title: val("pub-title"),
-                journal: val("pub-journal") || null,
-                publication_date: val("pub-date") || null,
-                authors: val("pub-authors") ? val("pub-authors").split(",").map(a => a.trim()) : [],
-                url: null
-            }] : [];
-        const awards = val("award-title") ? [{
-                title: val("award-title"),
-                organization: val("award-org") || null,
-                date: val("award-date") || null,
-                description: null
-            }] : [];
-        const hobbies = val("hobbies")
-            ? val("hobbies").split(",").map(h => ({ name: h.trim() })).filter(h => h.name)
-            : [];
-        const requestPayload = {
+        catch (error) {
+            console.error("Cloudinary upload error:", error);
+            return null;
+        }
+    }
+    function buildRequestPayload(photoUrl) {
+        return {
             photo: photoUrl,
             personal_info: {
                 first_name: val("first-name"),
@@ -100,40 +81,89 @@ document.addEventListener("DOMContentLoaded", () => {
                 date_of_birth: val("birth-date"),
                 nationality: val("nationality"),
                 country_of_residence: val("country"),
-                gender: val("gender")
+                gender: (val("gender") || "other")
             },
-            languages: languages,
-            work_experience: work_experience,
-            scientific_interests: scientific_interests,
-            publications: publications,
-            awards: awards,
-            favorite_subjects_in_school: [val("school-subject")],
-            programming_skills: programming_skills,
+            languages: val("lang-name") ? [{
+                    name: val("lang-name"),
+                    proficiency: (val("lang-level") || "intermediate")
+                }] : [],
+            work_experience: val("job-title") ? [{
+                    job_title: val("job-title"),
+                    company: val("job-company") || "Unknown",
+                    location: val("job-location") || "Unknown",
+                    from_date: val("job-from") || val("birth-date"),
+                    to_date: val("job-to") || null,
+                    description: val("job-desc") || null
+                }] : [],
+            scientific_interests: val("sci-name") ? [{
+                    name: val("sci-name"),
+                    description: val("sci-desc") || null
+                }] : [],
+            publications: val("pub-title") ? [{
+                    title: val("pub-title"),
+                    journal: val("pub-journal") || null,
+                    publication_date: val("pub-date") || null,
+                    authors: val("pub-authors") ? val("pub-authors").split(",").map(a => a.trim()) : [],
+                    url: null
+                }] : [],
+            awards: val("award-title") ? [{
+                    title: val("award-title"),
+                    organization: val("award-org") || null,
+                    date: val("award-date") || null,
+                    description: null
+                }] : [],
+            favorite_subjects_in_school: [(val("school-subject") || "computer_science")],
+            programming_skills: val("prog-lang") ? [{
+                    language: val("prog-lang"),
+                    level: (val("prog-level") || "intermediate")
+                }] : [],
             device_access: {
                 weekly_hours: Number(val("device-hours")) || 40
             },
-            hobbies: hobbies
+            hobbies: val("hobbies")
+                ? val("hobbies").split(",").map(h => ({ name: h.trim() })).filter(h => h.name)
+                : []
         };
+    }
+    async function submitToBackend(payload) {
         try {
-            const response = await fetch("http://localhost:8000/api/v1/user-cv", {
+            const response = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(requestPayload),
+                body: JSON.stringify(payload),
             });
-            if (response.ok) {
-                alert("Резюме успішно збережено на сервері!");
-                form.reset();
-                submitBtn.disabled = true;
-            }
-            else {
+            if (!response.ok) {
                 const errData = await response.json();
-                console.error("Помилка валідації FastAPI:", errData);
-                alert("Помилка при збереженні (перевір консоль браузера).");
+                console.error("FastAPI validation error:", errData);
+                return false;
             }
+            return true;
         }
         catch (err) {
-            console.error("Мережева помилка:", err);
-            alert("Помилка з'єднання із сервером.");
+            console.error("Network error:", err);
+            return false;
         }
-    });
+    }
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        submitBtn.disabled = true;
+        let photoUrl = null;
+        const photoFileInput = document.getElementById("photo-file");
+        if (photoFileInput.files && photoFileInput.files[0]) {
+            photoUrl = await uploadPhoto(photoFileInput.files[0]);
+        }
+        const requestPayload = buildRequestPayload(photoUrl);
+        const isSuccess = await submitToBackend(requestPayload);
+        if (isSuccess) {
+            alert("CV successfully saved to the server!");
+            form.reset();
+        }
+        else {
+            alert("Failed to save CV. Check browser console for details.");
+            submitBtn.disabled = false;
+        }
+    }
+    form.addEventListener("input", validateForm);
+    form.addEventListener("submit", handleFormSubmit);
 });
+export {};

@@ -44,7 +44,7 @@
         <nav id="main-nav">
             <ul>
                 <li><a class="scaling" href="/" rel="noopener noreferrer">Головна</a></li>
-                <li><a class="scaling" href="/catalog.html" rel="noopener noreferrer">Каталог</a></li>
+                <!-- <li><a class="scaling" href="/catalog.html" rel="noopener noreferrer">Каталог</a></li> -->
                 <li><a class="scaling" href="/add-member.html" rel="noopener noreferrer">Додати резюме</a></li>
             </ul>
         </nav>
@@ -56,7 +56,105 @@
         </div>
     </noscript>
 
-    <main></main>
+    <main class="catalog-main">
+        <section class="catalog-section">
+            <div class="catalog-header">
+                <h1>Каталог резюме учасників</h1>
+                <p>Переглядайте анкети команди, шукайте потрібні навички та контакти.</p>
+            </div>
+
+            <div class="catalog-content" aria-label="Список резюме">
+                <div class="catalog-row">
+                    <div class="row-meta">
+                        <span id="total-count" class="fadedText">Завантаження резюме...</span>
+                    </div>
+
+                    <article class="row-main">
+                        <div class="card-avatar">
+                            <img src="./public/cv.svg" alt="Аватар учасника" />
+                        </div>
+                        <div class="card-info">
+                            <h3>Максим Петренко</h3>
+                            <p class="fadedText">Frontend Developer</p>
+                            <div class="card-badges">
+                                <span class="badge">TypeScript</span>
+                                <span class="badge">Advanced</span>
+                            </div>
+                        </div>
+                        <a href="/member.html?id=example" class="cta-button" rel="noopener noreferrer">
+                            Переглянути профіль
+                        </a>
+                    </article>
+                </div>
+
+                <nav class="pagination" aria-label="Пагінація сторінок каталогу">
+                    <button id="prev-page" class="pagination-btn cta-button" disabled>&larr; Попередня</button>
+                    <div id="pagination-numbers" class="pagination-pages">
+                        <button class="pagination-num cta-button active">1</button>
+                        <button class="pagination-num cta-button">2</button>
+                    </div>
+                    <button id="next-page" class="pagination-btn cta-button">Наступна &rarr;</button>
+                </nav>
+            </div>
+        </section>
+
+        <aside class="catalog-filters" aria-label="Фільтри пошуку">
+            <form id="filters-form">
+                <h2>Фільтри</h2>
+
+                <div class="filter-group">
+                    <label for="filter-search">Пошук за ім'ям / роллю:</label>
+                    <input type="search" id="filter-search" name="search" placeholder="Введіть ім'я або посаду..." />
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-prog-lang">Мова програмування:</label>
+                    <select id="filter-prog-lang" name="programmingLanguage">
+                        <option value="">Усі технології</option>
+                        <option value="TypeScript">TypeScript</option>
+                        <option value="Python">Python</option>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="C++">C++</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-prog-level">Рівень програмування:</label>
+                    <select id="filter-prog-level" name="programmingLevel">
+                        <option value="">Будь-який</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                        <option value="expert">Expert</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-subject">Улюблений шкільний предмет:</label>
+                    <select id="filter-subject" name="favoriteSubject">
+                        <option value="">Усі предмети</option>
+                        <option value="computer_science">Інформатика</option>
+                        <option value="mathematics">Математика</option>
+                        <option value="physics">Фізика</option>
+                        <option value="english">Англійська мова</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-hours">Доступність (від год/тиждень):</label>
+                    <div class="range-container">
+                        <input type="range" id="filter-hours" name="minHours" min="0" max="168" value="0" step="4" />
+                        <span id="hours-value">0 год</span>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="cta-button apply-btn">Застосувати</button>
+                    <button type="reset" class="cta-button reset-btn">Скинути</button>
+                </div>
+            </form>
+        </aside>
+    </main>
 
     <footer id="footer">
         <p>&copy; <time id="current-year" datetime="2026">2026</time> Team CV Network. Всі права захищено.</p>
@@ -68,6 +166,7 @@
     </footer>
 
     <script type="module" src="./src/js/index.js"></script>
+    <script type="module" src="./src/js/catalog.js"></script>
 </body>
 
 </html>
