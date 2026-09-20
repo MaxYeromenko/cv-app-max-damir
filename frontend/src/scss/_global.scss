@@ -55,6 +55,12 @@ body {
         color: var(--text-color);
         background-color: var(--quinary-color);
         border: 2px solid var(--quaternary-color);
+        width: 100%;
+
+        &:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
     }
 
     textarea {
