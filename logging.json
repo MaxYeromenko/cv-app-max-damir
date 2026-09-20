@@ -17,7 +17,7 @@
       "class": "logging.handlers.RotatingFileHandler",
       "level": "INFO",
       "formatter": "fmt",
-      "filename": "logs/app.log",
+      "filename": "backend/logs/app.log",
       "maxBytes": 5242880,
       "backupCount": 3,
       "encoding": "utf-8"

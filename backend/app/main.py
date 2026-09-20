@@ -1,15 +1,15 @@
 import logging
 
-from app.logging_config import setup_logging
+from backend.app.logging_config import setup_logging
 
 setup_logging()
 
-from app.db import cvs
+from backend.app.db import get_collection
 from bson import ObjectId
 from bson.errors import InvalidId
 from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
-from app.schemas import UserCVRequest, UserCVResponse, USER_CV_UPDATE_ALLOWED_FIELDS
+from backend.app.schemas import UserCVRequest, UserCVResponse, USER_CV_UPDATE_ALLOWED_FIELDS
 from typing import Any
 
 
@@ -17,6 +17,11 @@ app = FastAPI(title="CV App")
 
 logger = logging.getLogger(__name__)
 
+try:
+    cvs = get_collection('cvs')
+except Exception as err:
+    logger.error("Failed to get collection.", exc_info=err)
+    raise HTTPException(status_code=500, detail="Internal Server Error.")
 
 class PathError(Exception):
     pass
@@ -176,4 +181,3 @@ async def delete_user_cv(user_id: str) -> dict[str, str]:
     }
     logger.info("Successfully deleted doc from db.")
     return answer
-
