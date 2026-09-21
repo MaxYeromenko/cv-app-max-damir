@@ -1,8 +1,9 @@
-import os
-from dotenv import load_dotenv
+import json
+from app.schemas import *
 
-load_dotenv()
+with open("schemas/request_example.json", 'r', encoding="utf-8") as req_exm_file:
+    payload = json.load(req_exm_file)
 
-key = os.getenv("key")
-print(key)
+payload['personal_info']["first_name"] = ""
 
+model = UserCVRequest(**payload)
