@@ -7,13 +7,20 @@ setup_logging()
 from backend.app.db import get_collection
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.encoders import jsonable_encoder
 from backend.app.schemas import UserCVRequest, UserCVResponse, USER_CV_UPDATE_ALLOWED_FIELDS
 from typing import Any
-
+from slowapi import _rate_limit_exceeded_handler, Limiter
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 app = FastAPI(title="CV App")
+
+limiter = Limiter(key_func=get_remote_address)
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +73,8 @@ async def validate_fields_to_update(_id: ObjectId, fields_to_update: dict[str, A
     return validated_fields_to_update
 
 @app.get("/")
-async def root():
+@limiter.limit("30/minute")
+async def root(request: Request):
 
     logger.info("Successfully opened root endpoint.")
     return {
@@ -74,7 +82,11 @@ async def root():
     }
 
 @app.get("/api/v1/user-cv/{user_id}", response_model=UserCVResponse)
-async def get_user_cv(user_id: str):
+@limiter.limit("30/minute")
+async def get_user_cv(
+        request: Request,
+        user_id: str
+):
     try:
         _id = ObjectId(user_id)
     except InvalidId as err:
@@ -95,8 +107,37 @@ async def get_user_cv(user_id: str):
     logger.info("Successfully got doc from db.")
     return result
 
+@app.get("/api/v1/user-cv")
+@limiter.limit("20/minute")
+async def get_all_user_cvs(
+        request: Request,
+        skip: int = Query(gt=0, default=0),
+        limit: int = Query(gt=0, le=100, default=100)
+) -> dict[str, int | list[dict[str, Any]]]:
+     try:
+        cursor = cvs.find().skip(skip).limit(limit)
+        items = []
+        async for doc in cursor:
+            del doc["_id"]
+            items.append(doc)
+        total_count = await cvs.count_documents({})
+        logger.info(f"Successfully retrieved {len(items)} CVs from db.")
+        return {
+            "total": total_count,
+            "skip": skip,
+            "limit": limit,
+            "items": items
+        }
+     except Exception as err:
+        logger.error("Failed to get CV list from db.", exc_info=err)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
 @app.post("/api/v1/user-cv")
-async def create_user_cv(user_cv: UserCVRequest) -> dict[str, str]:
+@limiter.limit("30/minute")
+async def create_user_cv(
+        request: Request,
+        user_cv: UserCVRequest
+) -> dict[str, str]:
     try:
         result = await cvs.insert_one(jsonable_encoder(user_cv))
     except Exception as err:
@@ -111,7 +152,12 @@ async def create_user_cv(user_cv: UserCVRequest) -> dict[str, str]:
     return answer
 
 @app.put("/api/v1/user-cv/{user_id}")
-async def update_user_cv(user_id: str, fields_to_update: dict[str, Any]) -> dict[str, Any]:
+@limiter.limit("30/minute")
+async def update_user_cv(
+        request: Request,
+        user_id: str,
+        fields_to_update: dict[str, Any]
+) -> dict[str, Any]:
     try:
         _id = ObjectId(user_id)
     except InvalidId as err:
@@ -158,7 +204,11 @@ async def update_user_cv(user_id: str, fields_to_update: dict[str, Any]) -> dict
     return answer
 
 @app.delete("/api/v1/user-cv/{user_id}")
-async def delete_user_cv(user_id: str) -> dict[str, str]:
+@limiter.limit("30/minute")
+async def delete_user_cv(
+        request: Request,
+        user_id: str
+) -> dict[str, str]:
     try:
         _id = ObjectId(user_id)
     except InvalidId as err:
