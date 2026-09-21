@@ -1,15 +1,15 @@
 import logging
 
-from backend.app.logging_config import setup_logging
+from app.logging_config import setup_logging
 
 setup_logging()
 
-from backend.app.db import get_collection
+from app.db import get_collection
 from bson import ObjectId
 from bson.errors import InvalidId
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.encoders import jsonable_encoder
-from backend.app.schemas import UserCVRequest, UserCVResponse, USER_CV_UPDATE_ALLOWED_FIELDS
+from app.schemas import UserCVRequest, UserCVResponse, USER_CV_UPDATE_ALLOWED_FIELDS
 from typing import Any
 from slowapi import _rate_limit_exceeded_handler, Limiter
 from slowapi.errors import RateLimitExceeded

@@ -3,8 +3,8 @@ import logging.config
 import os
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-LOG_DIR = BASE_DIR / "backend" / "logs"
+BASE_DIR = Path(__file__).resolve().parent.parent
+LOG_DIR = BASE_DIR  / "logs"
 CONFIG_PATH = BASE_DIR / "logging.json"
 
 def setup_logging():
