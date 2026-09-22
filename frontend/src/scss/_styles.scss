@@ -41,7 +41,7 @@ body {
         display: inline-block;
         padding: 12px 30px;
         background-color: var(--thirdly-color);
-        text-decoration: none;
+        text-decoration: none !important;
         font-weight: bold;
         font-size: 1.1rem;
         border: 2px solid var(--text-color);

@@ -1,15 +1,16 @@
 import {
     UserCV,
     ApiResponse,
+    API_URL,
+    FALLBACK_PHOTO,
     ProficiencyLevel,
     ProgrammingLevel,
     PROFICIENCY_LABELS,
     PROGRAMMING_LEVEL_LABELS,
 } from "./_types.js";
+import { escapeHtml } from "./_utils.js";
 
-const API_URL = "http://localhost:8000/api/v1/user-cv";
 const ITEMS_PER_PAGE = 5;
-const FALLBACK_PHOTO = "./public/cv.svg";
 
 const DUMMY_MEMBERS: UserCV[] = [
     {
@@ -23,24 +24,24 @@ const DUMMY_MEMBERS: UserCV[] = [
             date_of_birth: "2003-05-14",
             nationality: "Україна",
             country_of_residence: "Україна",
-            gender: "male"
+            gender: "male",
         },
         languages: [{ name: "Англійська", proficiency: "upper_intermediate" }],
         programming_skills: [
             { language: "TypeScript", level: "advanced" },
-            { language: "JavaScript", level: "advanced" }
+            { language: "JavaScript", level: "advanced" },
         ],
         work_experience: [{
             job_title: "Frontend Developer",
             company: "Tech Solutions",
-            from_date: "2023-01-10"
+            from_date: "2023-01-10",
         }],
         favorite_subjects_in_school: ["computer_science", "mathematics"],
         device_access: { weekly_hours: 40 },
         scientific_interests: [],
         publications: [],
         awards: [],
-        hobbies: [{ name: "Стрімінг" }]
+        hobbies: [{ name: "Стрімінг" }],
     },
     {
         id: "fallback-2",
@@ -53,57 +54,55 @@ const DUMMY_MEMBERS: UserCV[] = [
             date_of_birth: "2003-11-20",
             nationality: "Україна",
             country_of_residence: "Україна",
-            gender: "male"
+            gender: "male",
         },
         languages: [{ name: "Англійська", proficiency: "advanced" }],
         programming_skills: [
             { language: "Python", level: "expert" },
-            { language: "C++", level: "advanced" }
+            { language: "C++", level: "advanced" },
         ],
         work_experience: [{
             job_title: "Backend Developer",
             company: "Data Corp",
-            from_date: "2022-05-15"
+            from_date: "2022-05-15",
         }],
         favorite_subjects_in_school: ["physics", "computer_science"],
         device_access: { weekly_hours: 35 },
         scientific_interests: [],
         publications: [],
         awards: [],
-        hobbies: []
-    }
+        hobbies: [],
+    },
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
-    const catalogContent = document.querySelector(".catalog-content") as HTMLElement;
-    const paginationNav = catalogContent?.querySelector(".pagination") as HTMLElement;
-    const paginationNumbers = document.getElementById("pagination-numbers") as HTMLElement;
-    const prevPageBtn = document.getElementById("prev-page") as HTMLButtonElement;
-    const nextPageBtn = document.getElementById("next-page") as HTMLButtonElement;
+    const catalogContent = document.querySelector(".catalog-content") as HTMLElement | null;
+    const paginationNav = catalogContent?.querySelector(".pagination") as HTMLElement | null;
+    const paginationNumbers = document.getElementById("pagination-numbers");
+    const prevPageBtn = document.getElementById("prev-page") as HTMLButtonElement | null;
+    const nextPageBtn = document.getElementById("next-page") as HTMLButtonElement | null;
 
-    const filtersForm = document.getElementById("filters-form") as HTMLFormElement;
-    const searchInput = document.getElementById("filter-search") as HTMLInputElement;
-    const progLangSelect = document.getElementById("filter-prog-lang") as HTMLSelectElement;
-    const progLevelSelect = document.getElementById("filter-prog-level") as HTMLSelectElement;
-    const subjectSelect = document.getElementById("filter-subject") as HTMLSelectElement;
-    const hoursInput = document.getElementById("filter-hours") as HTMLInputElement;
-    const hoursValueSpan = document.getElementById("hours-value") as HTMLElement;
+    const filtersForm = document.getElementById("filters-form") as HTMLFormElement | null;
+    const searchInput = document.getElementById("filter-search") as HTMLInputElement | null;
+    const progLangSelect = document.getElementById("filter-prog-lang") as HTMLSelectElement | null;
+    const progLevelSelect = document.getElementById("filter-prog-level") as HTMLSelectElement | null;
+    const subjectSelect = document.getElementById("filter-subject") as HTMLSelectElement | null;
+    const hoursInput = document.getElementById("filter-hours") as HTMLInputElement | null;
+    const hoursValueSpan = document.getElementById("hours-value");
 
     let allMembers: UserCV[] = [];
     let filteredMembers: UserCV[] = [];
     let currentPage = 1;
     let isDbError = false;
 
-    async function fetchMembersData(): Promise<{ items: UserCV[], error: boolean }> {
+    async function fetchMembersData(): Promise<{ items: UserCV[]; error: boolean }> {
         try {
             const response = await fetch(`${API_URL}?skip=0&limit=100`);
-            if (!response.ok) {
-                throw new Error(`Server responded with status: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
             const data: ApiResponse = await response.json();
             return { items: data.items || [], error: false };
         } catch (error) {
-            console.error("Error fetching data from the database:", error);
+            console.error("Помилка завантаження даних із сервера:", error);
             return { items: [], error: true };
         }
     }
@@ -112,22 +111,22 @@ document.addEventListener("DOMContentLoaded", () => {
         const row = document.createElement("div");
         row.className = "catalog-row";
 
-        const location = cv.personal_info?.country_of_residence || cv.personal_info?.nationality || "Україна";
-        const email = cv.personal_info?.email || "—";
-        const phone = cv.personal_info?.phone || "—";
+        const location = escapeHtml(cv.personal_info?.country_of_residence || cv.personal_info?.nationality || "Україна");
+        const email = escapeHtml(cv.personal_info?.email || "—");
+        const phone = escapeHtml(cv.personal_info?.phone || "—");
         const hours = cv.device_access?.weekly_hours ? `${cv.device_access.weekly_hours} год/тиждень` : "Гнучкий графік";
-        const fullName = `${cv.personal_info?.first_name || ""} ${cv.personal_info?.last_name || ""}`.trim() || "Без імені";
-        const role = cv.work_experience?.[0]?.job_title || "IT Спеціаліст";
-        const photoSrc = cv.photo || FALLBACK_PHOTO;
+        const fullName = escapeHtml(`${cv.personal_info?.first_name || ""} ${cv.personal_info?.last_name || ""}`.trim() || "Без імені");
+        const role = escapeHtml(cv.work_experience?.[0]?.job_title || "IT Спеціаліст");
+        const photoSrc = cv.photo ? encodeURI(cv.photo) : FALLBACK_PHOTO;
 
         const langs = (cv.languages || []).map((l) => {
             const formattedLevel = PROFICIENCY_LABELS[l.proficiency as ProficiencyLevel] || l.proficiency;
-            return `${l.name} — ${formattedLevel}`;
+            return `${escapeHtml(l.name)} — ${escapeHtml(formattedLevel)}`;
         }).join(", ") || "Українська";
 
         const badgesHtml = (cv.programming_skills || []).slice(0, 3).map((s) => {
             const levelLabel = PROGRAMMING_LEVEL_LABELS[s.level as ProgrammingLevel] || s.level;
-            return `<span class="badge">${s.language} · ${levelLabel}</span>`;
+            return `<span class="badge">${escapeHtml(s.language)} · ${escapeHtml(levelLabel)}</span>`;
         }).join("");
 
         row.innerHTML = `
@@ -149,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         ${badgesHtml || '<span class="badge">Стек не вказано</span>'}
                     </div>
                 </div>
-                <a href="/member.html?id=${cv.id}" class="cta-button" rel="noopener noreferrer">Переглянути профіль</a>
+                <a href="/member.html?id=${encodeURIComponent(cv.id)}" class="cta-button" rel="noopener noreferrer">Переглянути профіль</a>
             </article>
         `;
         return row;
@@ -171,7 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const emptyState = document.createElement("div");
             emptyState.className = "empty-state";
             emptyState.innerHTML = `<p class="fadedText">За вашим запитом жодного резюме не знайдено.</p>`;
-
             catalogContent.insertBefore(emptyState, paginationNav);
             updatePaginationUI(0);
             return;
@@ -182,8 +180,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const pageItems = filteredMembers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
         pageItems.forEach((cv) => {
-            const rowElement = createRowElement(cv);
-            catalogContent.insertBefore(rowElement, paginationNav);
+            catalogContent.insertBefore(createRowElement(cv), paginationNav);
         });
 
         updatePaginationUI(totalPages);
@@ -208,15 +205,15 @@ document.addEventListener("DOMContentLoaded", () => {
     function handlePageChange(page: number): void {
         currentPage = page;
         renderCatalog();
-        catalogContent.scrollIntoView({ behavior: "smooth" });
+        catalogContent?.scrollIntoView({ behavior: "smooth" });
     }
 
     function applyFilters(): void {
-        const query = searchInput.value.trim().toLowerCase();
-        const selectedLang = progLangSelect.value.trim().toLowerCase();
-        const selectedLevel = progLevelSelect.value.trim().toLowerCase();
-        const selectedSubject = subjectSelect.value.trim();
-        const minHours = Number(hoursInput.value) || 0;
+        const query = searchInput?.value.trim().toLowerCase() || "";
+        const selectedLang = progLangSelect?.value.trim().toLowerCase() || "";
+        const selectedLevel = progLevelSelect?.value.trim().toLowerCase() || "";
+        const selectedSubject = subjectSelect?.value.trim() || "";
+        const minHours = Number(hoursInput?.value) || 0;
 
         filteredMembers = allMembers.filter((cv) => {
             const fullName = `${cv.personal_info?.first_name || ""} ${cv.personal_info?.last_name || ""}`.toLowerCase();
@@ -236,9 +233,9 @@ document.addEventListener("DOMContentLoaded", () => {
         renderCatalog();
     }
 
-    async function init() {
+    async function init(): Promise<void> {
         hoursInput?.addEventListener("input", () => {
-            if (hoursValueSpan) hoursValueSpan.textContent = `${hoursInput.value} год`;
+            if (hoursValueSpan && hoursInput) hoursValueSpan.textContent = `${hoursInput.value} год`;
         });
 
         filtersForm?.addEventListener("submit", (e) => {
@@ -265,16 +262,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         const fetchResult = await fetchMembersData();
-
-        if (fetchResult.error) {
-            isDbError = true;
-            allMembers = DUMMY_MEMBERS;
-        } else {
-            isDbError = false;
-            allMembers = fetchResult.items;
-        }
-
+        isDbError = fetchResult.error;
+        allMembers = isDbError ? DUMMY_MEMBERS : fetchResult.items;
         filteredMembers = [...allMembers];
+
         renderCatalog();
     }
 

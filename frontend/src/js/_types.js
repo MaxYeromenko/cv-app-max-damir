@@ -1,3 +1,10 @@
+export const API_URL = "http://localhost:8000/api/v1/user-cv";
+export const FALLBACK_PHOTO = "./public/cv.svg";
+export const GENDER_LABELS = {
+    male: "Чоловіча",
+    female: "Жіноча",
+    other: "Інша",
+};
 export const PROFICIENCY_LABELS = {
     beginner: "A1 (Beginner)",
     elementary: "A2 (Elementary)",

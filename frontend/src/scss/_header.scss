@@ -36,3 +36,9 @@ header {
         }
     }
 }
+
+@media(max-width:460px) {
+    header {
+        flex-direction: column;
+    }
+}
