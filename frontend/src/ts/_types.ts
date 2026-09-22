@@ -106,6 +106,15 @@ export interface ApiResponse {
     items: UserCV[];
 }
 
+export const API_URL = "http://localhost:8000/api/v1/user-cv";
+export const FALLBACK_PHOTO = "./public/cv.svg";
+
+export const GENDER_LABELS: Record<Gender, string> = {
+    male: "Чоловіча",
+    female: "Жіноча",
+    other: "Інша",
+};
+
 export const PROFICIENCY_LABELS: Record<ProficiencyLevel, string> = {
     beginner: "A1 (Beginner)",
     elementary: "A2 (Elementary)",
