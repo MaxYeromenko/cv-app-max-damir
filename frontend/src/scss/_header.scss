@@ -1,0 +1,44 @@
+@use "./patterns" as *;
+
+header {
+    flex-direction: row;
+    justify-content: space-between !important;
+
+    .logo-container,
+    #main-nav {
+        @extend %centered-flex;
+        padding: 0 10px;
+        height: 100%;
+    }
+
+    .logo-container {
+        &:hover {
+            transform: scale(1.05);
+        }
+
+        svg {
+            aspect-ratio: 1/1;
+            width: 40px;
+        }
+
+        a {
+            font-size: 1.25rem;
+        }
+    }
+
+    #main-nav {
+        justify-content: flex-end;
+
+        ul {
+            @extend %centered-flex;
+            gap: 25px;
+            list-style-type: none;
+        }
+    }
+}
+
+@media(max-width:460px) {
+    header {
+        flex-direction: column;
+    }
+}

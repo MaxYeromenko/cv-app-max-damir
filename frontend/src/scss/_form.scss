@@ -1,0 +1,88 @@
+@use "./patterns" as *;
+
+.form-section {
+    text-align: left;
+
+    form,
+    fieldset,
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        width: 100%;
+    }
+
+    form {
+        fieldset {
+            @extend %rounded-all-edges;
+            border: 2px solid var(--quaternary-color);
+            padding: 25px;
+
+            legend {
+                font-size: 1.1rem;
+                font-weight: bold;
+                color: var(--quaternary-color);
+                padding: 0 10px;
+                text-align: center;
+            }
+
+            .form-group {
+                gap: 6px;
+
+                label {
+                    font-weight: 500;
+                    font-size: 0.95rem;
+
+                    .required {
+                        color: #ff6b6b;
+                    }
+                }
+
+                input,
+                select,
+                textarea {
+                    width: 100%;
+
+                    &:focus {
+                        outline: 1px solid var(--text-color);
+                    }
+                }
+
+                input[type="date"] {
+                    &::-webkit-calendar-picker-indicator {
+                        filter: invert(1);
+                        cursor: pointer;
+                        opacity: 0.8;
+
+                        &:hover {
+                            opacity: 1;
+                        }
+                    }
+                }
+
+                .error-message {
+                    font-size: 0.85rem;
+                    color: #ff8080;
+                    font-weight: bold;
+                }
+            }
+        }
+
+        button[type="submit"] {
+            align-self: center;
+            padding: 12px 35px;
+            background-color: var(--thirdly-color);
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: 2px solid var(--text-color);
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+
+            &:hover:not(:disabled) {
+                background-color: var(--quaternary-color);
+                color: var(--quinary-color);
+                transform: scale(1.05);
+            }
+        }
+    }
+}

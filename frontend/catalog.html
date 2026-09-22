@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="./public/cv.svg" type="image/svg+xml">
+    <link rel="icon" href="./public/cv.png" type="image/png">
+    <link rel="shortcut icon" href="./public/cv.ico">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./src/css/importer.css">
+    <title>Team CV Network | Catalog</title>
+</head>
+
+<body>
+    <header>
+        <div class="logo-container">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="46" fill="var(--quinary-color)" stroke="var(--quaternary-color)"
+                    stroke-width="2" />
+
+                <path d="M32 24 H58 L68 34 V76 H32 Z" fill="var(--text-color)" />
+                <path d="M58 24 V34 H68 Z" fill="var(--secondary-color)" />
+
+                <circle cx="50" cy="44" r="8" fill="var(--quinary-color)" />
+                <path d="M38 62 C38 56 43 54 50 54 C57 54 62 56 62 62 Z" fill="var(--quinary-color)" />
+
+                <rect x="38" y="65" width="24" height="3" rx="1.5" fill="var(--quinary-color)" />
+                <rect x="38" y="70" width="24" height="3" rx="1.5" fill="var(--quinary-color)" />
+            </svg>
+            <a href="/" rel="noopener noreferrer">Team CV Network</a>
+        </div>
+
+        <button class="menu-toggle hidden" aria-label="Відкрити меню" aria-expanded="false">
+            <span class="hamburger">
+                <svg width="20" height="20" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <rect y="8" width="40" height="4" fill="#000" rx="2" />
+                    <rect y="18" width="40" height="4" fill="#000" rx="2" />
+                    <rect y="28" width="40" height="4" fill="#000" rx="2" />
+                </svg>
+            </span>
+        </button>
+
+        <nav id="main-nav">
+            <ul>
+                <li><a class="scaling" href="/" rel="noopener noreferrer">Головна</a></li>
+                <!-- <li><a class="scaling" href="/catalog.html" rel="noopener noreferrer">Каталог</a></li> -->
+                <li><a class="scaling" href="/add-member.html" rel="noopener noreferrer">Додати резюме</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <noscript>
+        <div style="background-color: #d32f2f; color: white; text-align: center; padding: 10px; font-weight: bold;">
+            Увага! JavaScript вимкнено у вашому браузері. Деякі інтерактивні функції сайту можуть працювати обмежено.
+        </div>
+    </noscript>
+
+    <main class="catalog-main">
+        <section class="catalog-section">
+            <div class="catalog-header">
+                <h1>Каталог резюме учасників</h1>
+                <p>Переглядайте анкети команди, шукайте потрібні навички та контакти.</p>
+            </div>
+
+            <div class="catalog-content" aria-label="Список резюме">
+                <div class="catalog-row">
+                    <div class="row-meta">
+                        <span id="total-count" class="fadedText">Завантаження резюме...</span>
+                    </div>
+
+                    <article class="row-main">
+                        <div class="card-avatar">
+                            <img src="./public/cv.svg" alt="Аватар учасника" />
+                        </div>
+                        <div class="card-info">
+                            <h3>Максим Петренко</h3>
+                            <p class="fadedText">Frontend Developer</p>
+                            <div class="card-badges">
+                                <span class="badge">TypeScript</span>
+                                <span class="badge">Advanced</span>
+                            </div>
+                        </div>
+                        <a href="/member.html?id=example" class="cta-button" rel="noopener noreferrer">
+                            Переглянути профіль
+                        </a>
+                    </article>
+                </div>
+
+                <nav class="pagination" aria-label="Пагінація сторінок каталогу">
+                    <button id="prev-page" class="pagination-btn cta-button" disabled>&larr; Попередня</button>
+                    <div id="pagination-numbers" class="pagination-pages">
+                        <button class="pagination-num cta-button active">1</button>
+                        <button class="pagination-num cta-button">2</button>
+                    </div>
+                    <button id="next-page" class="pagination-btn cta-button">Наступна &rarr;</button>
+                </nav>
+            </div>
+        </section>
+
+        <aside class="catalog-filters" aria-label="Фільтри пошуку">
+            <form id="filters-form">
+                <h2>Фільтри</h2>
+
+                <div class="filter-group">
+                    <label for="filter-search">Пошук за ім'ям / роллю:</label>
+                    <input type="search" id="filter-search" name="search" placeholder="Введіть ім'я або посаду..." />
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-prog-lang">Мова програмування:</label>
+                    <select id="filter-prog-lang" name="programmingLanguage">
+                        <option value="">Усі технології</option>
+                        <option value="TypeScript">TypeScript</option>
+                        <option value="Python">Python</option>
+                        <option value="JavaScript">JavaScript</option>
+                        <option value="C++">C++</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-prog-level">Рівень програмування:</label>
+                    <select id="filter-prog-level" name="programmingLevel">
+                        <option value="">Будь-який</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                        <option value="expert">Expert</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-subject">Улюблений шкільний предмет:</label>
+                    <select id="filter-subject" name="favoriteSubject">
+                        <option value="">Усі предмети</option>
+                        <option value="computer_science" selected>Інформатика</option>
+                        <option value="mathematics">Математика</option>
+                        <option value="physics">Фізика</option>
+                        <option value="chemistry">Хімія</option>
+                        <option value="biology">Біологія</option>
+                        <option value="history">Історія</option>
+                        <option value="geography">Географія</option>
+                        <option value="literature">Література</option>
+                        <option value="english">Англійська мова</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filter-hours">Доступність (від год/тиждень):</label>
+                    <div class="range-container">
+                        <input type="range" id="filter-hours" name="minHours" min="0" max="168" value="0" step="4" />
+                        <span id="hours-value">0 год</span>
+                    </div>
+                </div>
+
+                <div class="filter-actions">
+                    <button type="submit" class="cta-button apply-btn">Застосувати</button>
+                    <button type="reset" class="cta-button reset-btn">Скинути</button>
+                </div>
+            </form>
+        </aside>
+    </main>
+
+    <footer id="footer">
+        <p>&copy; <time id="current-year" datetime="2026">2026</time> Team CV Network. Всі права захищено.</p>
+        <address>
+            Розробка: Максим &amp; Дамір |
+            <a class="scaling" href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub
+                репозиторій</a>
+        </address>
+    </footer>
+
+    <script type="module" src="./src/js/index.js"></script>
+    <script type="module" src="./src/js/catalog.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="./public/cv.svg" type="image/svg+xml">
+    <link rel="icon" href="./public/cv.png" type="image/png">
+    <link rel="shortcut icon" href="./public/cv.ico">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./src/css/importer.css">
+    <title>Team CV Network | Add member</title>
+</head>
+
+<body>
+    <header>
+        <div class="logo-container">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="46" fill="var(--quinary-color)" stroke="var(--quaternary-color)"
+                    stroke-width="2" />
+
+                <path d="M32 24 H58 L68 34 V76 H32 Z" fill="var(--text-color)" />
+                <path d="M58 24 V34 H68 Z" fill="var(--secondary-color)" />
+
+                <circle cx="50" cy="44" r="8" fill="var(--quinary-color)" />
+                <path d="M38 62 C38 56 43 54 50 54 C57 54 62 56 62 62 Z" fill="var(--quinary-color)" />
+
+                <rect x="38" y="65" width="24" height="3" rx="1.5" fill="var(--quinary-color)" />
+                <rect x="38" y="70" width="24" height="3" rx="1.5" fill="var(--quinary-color)" />
+            </svg>
+            <a href="/" rel="noopener noreferrer">Team CV Network</a>
+        </div>
+
+        <button class="menu-toggle hidden" aria-label="Відкрити меню" aria-expanded="false">
+            <span class="hamburger">
+                <svg width="20" height="20" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <rect y="8" width="40" height="4" fill="#000" rx="2" />
+                    <rect y="18" width="40" height="4" fill="#000" rx="2" />
+                    <rect y="28" width="40" height="4" fill="#000" rx="2" />
+                </svg>
+            </span>
+        </button>
+
+        <nav id="main-nav">
+            <ul>
+                <li><a class="scaling" href="/" rel="noopener noreferrer">Головна</a></li>
+                <li><a class="scaling" href="/catalog.html" rel="noopener noreferrer">Каталог</a></li>
+                <!-- <li><a class="scaling" href="/add-member.html" rel="noopener noreferrer">Додати резюме</a></li> -->
+            </ul>
+        </nav>
+    </header>
+
+    <noscript>
+        <div style="background-color: #d32f2f; color: white; text-align: center; padding: 10px; font-weight: bold;">
+            Увага! JavaScript вимкнено у вашому браузері. Деякі інтерактивні функції сайту можуть працювати обмежено.
+        </div>
+    </noscript>
+
+    <main>
+        <section class="form-section">
+            <h1>Додати нове резюме учасника</h1>
+            <p>Заповніть усі обов'язкові поля для формування профілю в базі даних.</p>
+
+            <form id="add-member-form" novalidate>
+                <fieldset>
+                    <legend>Особиста інформація</legend>
+
+                    <div class="form-group">
+                        <label for="first-name">Ім'я: <span class="required">*</span></label>
+                        <input type="text" id="first-name" required placeholder="Максим" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="last-name">Прізвище: <span class="required">*</span></label>
+                        <input type="text" id="last-name" required placeholder="Петренко" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="preferred-name">Псевдонім / Бажане ім'я:</label>
+                        <input type="text" id="preferred-name" placeholder="Max" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="gender">Стать: <span class="required">*</span></label>
+                        <select id="gender" required>
+                            <option value="male">Чоловіча</option>
+                            <option value="female">Жіноча</option>
+                            <option value="other">Інша</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="birth-date">Дата народження: <span class="required">*</span></label>
+                        <input type="date" id="birth-date" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nationality">Громадянство: <span class="required">*</span></label>
+                        <input type="text" id="nationality" required placeholder="Україна" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="country">Країна проживання: <span class="required">*</span></label>
+                        <input type="text" id="country" required placeholder="Україна" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">E-mail: <span class="required">*</span></label>
+                        <input type="email" id="email" required placeholder="user@example.com" />
+                        <span class="error-message" id="email-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Телефон: <span class="required">*</span></label>
+                        <input type="tel" id="phone" required placeholder="+380XXXXXXXXX" />
+                        <span class="error-message" id="phone-error"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photo-file">Фото профілю (Cloudinary):</label>
+                        <input type="file" id="photo-file" accept="image/*" />
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Навички та Мови</legend>
+
+                    <div class="form-group">
+                        <label for="prog-lang">Основна мова програмування:</label>
+                        <input type="text" id="prog-lang" placeholder="TypeScript" />
+                    </div>
+                    <div class="form-group">
+                        <label for="prog-level">Рівень програмування:</label>
+                        <select id="prog-level">
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate" selected>Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="expert">Expert</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lang-name">Іноземна мова:</label>
+                        <input type="text" id="lang-name" placeholder="English" />
+                    </div>
+                    <div class="form-group">
+                        <label for="lang-level">Рівень володіння:</label>
+                        <select id="lang-level">
+                            <option value="beginner">Beginner</option>
+                            <option value="elementary">Elementary</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="upper_intermediate" selected>Upper Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="native">Native</option>
+                        </select>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Останнє місце роботи</legend>
+
+                    <div class="form-group">
+                        <label for="job-title">Посада:</label>
+                        <input type="text" id="job-title" placeholder="Frontend Developer" />
+                    </div>
+                    <div class="form-group">
+                        <label for="job-company">Компанія:</label>
+                        <input type="text" id="job-company" placeholder="Tech Company" />
+                    </div>
+                    <div class="form-group">
+                        <label for="job-location">Локація:</label>
+                        <input type="text" id="job-location" placeholder="Remote / Kyiv" />
+                    </div>
+                    <div class="form-group">
+                        <label for="job-from">Період з:</label>
+                        <input type="date" id="job-from" />
+                    </div>
+                    <div class="form-group">
+                        <label for="job-to">Період по:</label>
+                        <input type="date" id="job-to" />
+                    </div>
+                    <div class="form-group">
+                        <label for="job-desc">Опис обов'язків:</label>
+                        <textarea id="job-desc" rows="2" placeholder="Розробка UI/UX, інтеграція з API..."></textarea>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Наукова діяльність та Публікації</legend>
+
+                    <div class="form-group">
+                        <label for="sci-name">Науковий інтерес:</label>
+                        <input type="text" id="sci-name" placeholder="Machine Learning" />
+                    </div>
+                    <div class="form-group">
+                        <label for="sci-desc">Опис інтересу:</label>
+                        <textarea id="sci-desc" rows="2" placeholder="Дослідження нейронних мереж..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pub-title">Назва публікації:</label>
+                        <input type="text" id="pub-title" placeholder="Дослідження алгоритмів..." />
+                    </div>
+                    <div class="form-group">
+                        <label for="pub-journal">Журнал / Конференція:</label>
+                        <input type="text" id="pub-journal" placeholder="Science Journal" />
+                    </div>
+                    <div class="form-group">
+                        <label for="pub-date">Дата публікації:</label>
+                        <input type="date" id="pub-date" />
+                    </div>
+                    <div class="form-group">
+                        <label for="pub-authors">Автори (через кому):</label>
+                        <input type="text" id="pub-authors" placeholder="М. Петренко, Д. Іванов" />
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Нагороди та Улюблені предмети</legend>
+
+                    <div class="form-group">
+                        <label for="award-title">Назва нагороди:</label>
+                        <input type="text" id="award-title" placeholder="Переможець Хакатону" />
+                    </div>
+                    <div class="form-group">
+                        <label for="award-org">Організація:</label>
+                        <input type="text" id="award-org" placeholder="IT KPI" />
+                    </div>
+                    <div class="form-group">
+                        <label for="award-date">Дата нагороди:</label>
+                        <input type="date" id="award-date" />
+                    </div>
+                    <div class="form-group">
+                        <label for="school-subject">Улюблений шкільний предмет:</label>
+                        <select id="school-subject">
+                            <option value="computer_science" selected>Інформатика</option>
+                            <option value="mathematics">Математика</option>
+                            <option value="physics">Фізика</option>
+                            <option value="chemistry">Хімія</option>
+                            <option value="biology">Біологія</option>
+                            <option value="history">Історія</option>
+                            <option value="geography">Географія</option>
+                            <option value="literature">Література</option>
+                            <option value="english">Англійська мова</option>
+                            <option value="other">Інше</option>
+                        </select>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Додаткова інформація</legend>
+
+                    <div class="form-group">
+                        <label for="device-hours">Доступність (годин на тиждень): <span
+                                class="required">*</span></label>
+                        <input type="number" id="device-hours" required min="0" max="168" value="40" />
+                    </div>
+                    <div class="form-group">
+                        <label for="hobbies">Хобі (через кому):</label>
+                        <input type="text" id="hobbies" placeholder="Спорт, читання, музика" />
+                    </div>
+                </fieldset>
+
+                <button type="submit" id="submit-btn" class="cta-button" disabled>Зберегти резюме</button>
+            </form>
+        </section>
+    </main>
+
+    <footer id="footer">
+        <p>&copy; <time id="current-year" datetime="2026">2026</time> Team CV Network. Всі права захищено.</p>
+        <address>
+            Розробка: Максим &amp; Дамір |
+            <a class="scaling" href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub
+                репозиторій</a>
+        </address>
+    </footer>
+
+    <script type="module" src="./src/js/index.js"></script>
+    <script type="module" src="./src/js/add-member.js"></script>
+</body>
+
+</html>

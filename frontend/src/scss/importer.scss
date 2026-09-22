@@ -1,3 +1,10 @@
+@use "themes";
 @use "global";
 @use "styles";
-@use "themes";
+
+@use "header";
+@use "main";
+@use "form";
+@use "catalog";
+@use "member";
+@use "footer";

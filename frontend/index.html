@@ -3,16 +3,144 @@
 
 <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="cv.svg" type="image/svg+xml">
-    <link rel="icon" href="cv.png" type="image/png">
-    <link rel="shortcut icon" href="cv.ico">
+    <link rel="icon" href="./public/cv.svg" type="image/svg+xml">
+    <link rel="icon" href="./public/cv.png" type="image/png">
+    <link rel="shortcut icon" href="./public/cv.ico">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CV is Here</title>
+    <link rel="stylesheet" href="./src/css/importer.css">
+    <title>Team CV Network | Home</title>
 </head>
 
 <body>
-    <div id="app"></div>
-    <script type="module" src="/src/ts/main.ts"></script>
+    <header>
+        <div class="logo-container">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="46" fill="var(--quinary-color)" stroke="var(--quaternary-color)"
+                    stroke-width="2" />
+
+                <path d="M32 24 H58 L68 34 V76 H32 Z" fill="var(--text-color)" />
+                <path d="M58 24 V34 H68 Z" fill="var(--secondary-color)" />
+
+                <circle cx="50" cy="44" r="8" fill="var(--quinary-color)" />
+                <path d="M38 62 C38 56 43 54 50 54 C57 54 62 56 62 62 Z" fill="var(--quinary-color)" />
+
+                <rect x="38" y="65" width="24" height="3" rx="1.5" fill="var(--quinary-color)" />
+                <rect x="38" y="70" width="24" height="3" rx="1.5" fill="var(--quinary-color)" />
+            </svg>
+            <a href="/" rel="noopener noreferrer">Team CV Network</a>
+        </div>
+
+        <button class="menu-toggle hidden" aria-label="Відкрити меню" aria-expanded="false">
+            <span class="hamburger">
+                <svg width="20" height="20" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
+                    <rect y="8" width="40" height="4" fill="#000" rx="2" />
+                    <rect y="18" width="40" height="4" fill="#000" rx="2" />
+                    <rect y="28" width="40" height="4" fill="#000" rx="2" />
+                </svg>
+            </span>
+        </button>
+
+        <nav id="main-nav">
+            <ul>
+                <!-- <li><a class="scaling" href="/" rel="noopener noreferrer">Головна</a></li> -->
+                <li><a class="scaling" href="/catalog.html" rel="noopener noreferrer">Каталог</a></li>
+                <li><a class="scaling" href="/add-member.html" rel="noopener noreferrer">Додати резюме</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <noscript>
+        <div style="background-color: #d32f2f; color: white; text-align: center; padding: 10px; font-weight: bold;">
+            Увага! JavaScript вимкнено у вашому браузері. Деякі інтерактивні функції сайту можуть працювати обмежено.
+        </div>
+    </noscript>
+
+    <main>
+        <section class="hero-section">
+            <h1>Цифрове портфоліо: Team CV Network</h1>
+            <p>Сучасна вебплатформа для зручного управління, пошуку та перегляду професійних резюме і профілів.
+                Досліджуйте наш технічний стек, компетенції, реалізовані проєкти та контактну інформацію в єдиному
+                цифровому просторі.
+            </p>
+            <a href="/catalog.html" class="cta-button" rel="noopener noreferrer">
+                Відкрити каталог
+            </a>
+        </section>
+
+        <section class="overview-section">
+            <h2>Короткий огляд системи</h2>
+            <div class="stats-grid">
+                <article class="stat-card">
+                    <h3>30+</h3>
+                    <p>Професійних профілів у базі даних</p>
+                </article>
+                <article class="stat-card">
+                    <h3>2</h3>
+                    <p>Розробники</p>
+                    <p>Максим &amp; Дамір</p>
+                </article>
+                <article class="stat-card">
+                    <h3>Стек</h3>
+                    <p>TS, SCSS, Python, FastAPI, MongoDB</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="media-section">
+            <h2>Відеопрезентація</h2>
+            <video src="./public/big-buck-bunny.mp4" controls autoplay muted loop></video>
+            <p class="fadedText">
+                Демонстраційний медіаконтент: "Big Buck Bunny" &#169; 2008, Blender Foundation
+                <br>
+                <a class="scaling" href="https://peach.blender.org/" target="_blank"
+                    rel="noopener noreferrer">www.bigbuckbunny.org
+                </a>
+            </p>
+        </section>
+
+        <section class="interactive-section">
+            <h2>Інтерактивна візуалізація (Canvas)</h2>
+            <canvas id="team-canvas" width="600" height="200"></canvas>
+            <p class="fadedText">
+                Джерело натхнення для Canvas: MDN Web Docs (реалізовано самостійно)
+                <br>
+                <a class="scaling" href="https://developer.mozilla.org/" target="_blank"
+                    rel="noopener noreferrer">developer.mozilla.org</a>
+            </p>
+        </section>
+
+        <section class="vector-section">
+            <h2>Фірмовий стиль проєкту</h2>
+            <svg width="120" height="120" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="46" fill="var(--quinary-color)" stroke="var(--quaternary-color)"
+                    stroke-width="2" />
+
+                <path d="M32 24 H58 L68 34 V76 H32 Z" fill="var(--text-color)" />
+                <path d="M58 24 V34 H68 Z" fill="var(--secondary-color)" />
+
+                <circle cx="50" cy="44" r="8" fill="var(--quinary-color)" />
+                <path d="M38 62 C38 56 43 54 50 54 C57 54 62 56 62 62 Z" fill="var(--quinary-color)" />
+
+                <rect x="38" y="65" width="24" height="3" rx="1.5" fill="var(--quinary-color)" />
+                <rect x="38" y="70" width="24" height="3" rx="1.5" fill="var(--quinary-color)" />
+            </svg>
+            <p class="fadedText">
+                Офіційний логотип: авторська розробка на основі відкритих векторних елементів (CC0)
+            </p>
+        </section>
+    </main>
+
+    <footer id="footer">
+        <p>&copy; <time id="current-year" datetime="2026">2026</time> Team CV Network. Всі права захищено.</p>
+        <address>
+            Розробка: Максим &amp; Дамір |
+            <a class="scaling" href="https://github.com" target="_blank" rel="noopener noreferrer">GitHub
+                репозиторій</a>
+        </address>
+    </footer>
+
+    <script type="module" src="./src/js/index.js"></script>
 </body>
 
 </html>
