@@ -10,10 +10,9 @@ load_dotenv()
 
 @pytest_asyncio.fixture
 async def collection():
-    client = AsyncMongoClient(os.getenv("MONGODB_URI"))
-    coll = client["users"]["test_cvs"]
-    yield coll
-    await client.close()
+    async with AsyncMongoClient(os.getenv("MONGODB_URI")) as client:
+        coll = client["users"]["test_cvs"]
+        yield coll
 
 
 @pytest_asyncio.fixture

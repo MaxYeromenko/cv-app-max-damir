@@ -1,21 +1,33 @@
 import logging
-
 from app.logging_config import setup_logging
 
 setup_logging()
 
-from app.db import get_collection
+import os
+from app.db import create_mongo_client
+from app.schemas import UserCVRequest, UserCVResponse, USER_CV_UPDATE_ALLOWED_FIELDS
 from bson import ObjectId
 from bson.errors import InvalidId
-from fastapi import FastAPI, HTTPException, Query, Request
+from contextlib import asynccontextmanager
+from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Query, Request, Depends
 from fastapi.encoders import jsonable_encoder
-from app.schemas import UserCVRequest, UserCVResponse, USER_CV_UPDATE_ALLOWED_FIELDS
 from typing import Any
 from slowapi import _rate_limit_exceeded_handler, Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
-app = FastAPI(title="CV App")
+load_dotenv()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.mongo_client = create_mongo_client(os.getenv("MONGODB_URI"))
+    app.state.cvs = app.state.mongo_client["users"]["cvs"]
+    yield
+    await app.state.mongo_client.close()
+
+app = FastAPI(title="CV App", lifespan=lifespan)
+
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -24,11 +36,8 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 logger = logging.getLogger(__name__)
 
-try:
-    cvs = get_collection('cvs')
-except Exception as err:
-    logger.error("Failed to get collection.", exc_info=err)
-    raise HTTPException(status_code=500, detail="Internal Server Error.")
+
+
 
 class PathError(Exception):
     pass
@@ -41,7 +50,10 @@ def get_by_dot_path(doc: dict[str, Any], path: str) -> Any:
 
       return current
 
-async def validate_fields_to_update(_id: ObjectId, fields_to_update: dict[str, Any]) -> dict[str, Any]:
+def get_cvs_collection(request: Request):
+    return request.app.state.cvs
+
+async def validate_fields_to_update(cvs, _id: ObjectId, fields_to_update: dict[str, Any]) -> dict[str, Any]:
     fields = fields_to_update.keys()
     if len(fields) == 0:
         raise ValueError("List of fields is empty.")
@@ -81,38 +93,40 @@ async def root(request: Request):
         "status":"ok"
     }
 
-@app.get("/api/v1/user-cv/{user_id}", response_model=UserCVResponse)
+@app.get("/api/v1/users-cvs/{user_id}", response_model=UserCVResponse)
 @limiter.limit("30/minute")
 async def get_user_cv(
         request: Request,
-        user_id: str
+        user_id: str,
+        cvs = Depends(get_cvs_collection)
 ):
     try:
         _id = ObjectId(user_id)
     except InvalidId as err:
-        logger.error("Failed to make ObjectID.", exc_info=err)
+        logger.error(str(err), exc_info=err)
         raise HTTPException(status_code=400, detail=str(err))
 
     try:
         result = await cvs.find_one({"_id": _id})
     except Exception as err:
         logger.error("Failed to get doc from db.", exc_info=err)
-        raise HTTPException(status_code=500, detail="Internal Server Error")
+        raise HTTPException(status_code=500, detail="Internal Server Error.")
 
     if result is None:
         logger.warning("No matched doc was founded.")
-        raise HTTPException(status_code=404, detail="CV not found")
+        raise HTTPException(status_code=404, detail="CV not found.")
 
     del result["_id"]
     logger.info("Successfully got doc from db.")
     return result
 
-@app.get("/api/v1/user-cv")
+@app.get("/api/v1/users-cvs")
 @limiter.limit("20/minute")
 async def get_all_user_cvs(
         request: Request,
-        skip: int = Query(gt=0, default=0),
-        limit: int = Query(gt=0, le=100, default=100)
+        skip: int = 0,
+        limit: int = Query(le=100, default=10),
+        cvs = Depends(get_cvs_collection)
 ) -> dict[str, int | list[dict[str, Any]]]:
      try:
         cursor = cvs.find().skip(skip).limit(limit)
@@ -132,11 +146,13 @@ async def get_all_user_cvs(
         logger.error("Failed to get CV list from db.", exc_info=err)
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@app.post("/api/v1/user-cv")
+@app.post("/api/v1/users-cvs")
 @limiter.limit("30/minute")
 async def create_user_cv(
         request: Request,
-        user_cv: UserCVRequest
+        user_cv: UserCVRequest,
+        cvs = Depends(get_cvs_collection)
+
 ) -> dict[str, str]:
     try:
         result = await cvs.insert_one(jsonable_encoder(user_cv))
@@ -151,22 +167,24 @@ async def create_user_cv(
     logger.info("Successfully created doc in db.")
     return answer
 
-@app.put("/api/v1/user-cv/{user_id}")
+@app.put("/api/v1/users-cvs/{user_id}")
 @limiter.limit("30/minute")
 async def update_user_cv(
         request: Request,
         user_id: str,
-        fields_to_update: dict[str, Any]
+        fields_to_update: dict[str, Any],
+        cvs = Depends(get_cvs_collection)
+
 ) -> dict[str, Any]:
     try:
         _id = ObjectId(user_id)
     except InvalidId as err:
-        logger.error("Failed to make ObjectID.", exc_info=err)
+        logger.error(str(err), exc_info=err)
         raise HTTPException(status_code=400, detail=str(err))
 
 
     try:
-        validated_fields = await validate_fields_to_update(_id, fields_to_update)
+        validated_fields = await validate_fields_to_update(cvs, _id, fields_to_update)
     except HTTPException as err:
         logger.error("Failed to validate fields to update.", exc_info=err)
         raise
@@ -203,16 +221,17 @@ async def update_user_cv(
     logger.info("Successfully updated doc in db.")
     return answer
 
-@app.delete("/api/v1/user-cv/{user_id}")
+@app.delete("/api/v1/users-cvs/{user_id}")
 @limiter.limit("30/minute")
 async def delete_user_cv(
         request: Request,
-        user_id: str
+        user_id: str,
+        cvs = Depends(get_cvs_collection)
 ) -> dict[str, str]:
     try:
         _id = ObjectId(user_id)
     except InvalidId as err:
-        logger.error("Failed to make ObjectID.", exc_info=err)
+        logger.error(str(err), exc_info=err)
         raise HTTPException(status_code=400, detail=str(err))
 
     try:

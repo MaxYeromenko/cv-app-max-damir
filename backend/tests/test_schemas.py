@@ -1,11 +1,9 @@
-import json
 import pytest
 from app.schemas import *
-from pathlib import Path
 from pydantic import ValidationError
 from typing import Any
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
 
 def get_by_dot_path(d: dict[str, Any], path: str, val: Any) -> Any:
     current = d
@@ -18,13 +16,6 @@ def get_by_dot_path(d: dict[str, Any], path: str, val: Any) -> Any:
             current = current[key]
 
     current[keys[-1]] = val
-
-@pytest.fixture
-def payload():
-    with open(BASE_DIR / "tests/schemas/request_example.json", 'r', encoding="utf-8") as req_exm_file:
-        payload = json.load(req_exm_file)
-    yield payload
-    del payload
 
 @pytest.mark.schemas_test
 def test_corr_payload(payload):

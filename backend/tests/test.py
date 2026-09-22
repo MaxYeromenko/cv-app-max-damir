@@ -1,9 +1,6 @@
-import json
-from app.schemas import *
+from app.main import app
+from fastapi.testclient import TestClient
 
-with open("schemas/request_example.json", 'r', encoding="utf-8") as req_exm_file:
-    payload = json.load(req_exm_file)
+client = TestClient(app)
 
-payload['personal_info']["first_name"] = ""
-
-model = UserCVRequest(**payload)
+print(client.get("/api/v1/users-cvs/6aae673312890cb267e63c47").headers)
