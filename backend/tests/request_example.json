@@ -1,0 +1,79 @@
+{
+      "photo": null,
+      "personal_info": {
+        "first_name": "Damir",
+        "last_name": "Max",
+        "email": "damir@example.com",
+        "phone": "+41791234567",
+        "date_of_birth": "2005-04-15",
+        "nationality": "Swiss",
+        "country_of_residence": "Switzerland",
+        "gender": "male"
+      },
+      "languages": [
+        {
+          "name": "English",
+          "proficiency": "advanced"
+        },
+        {
+          "name": "Russian",
+          "proficiency": "native"
+        }
+      ],
+      "work_experience": [
+        {
+          "job_title": "Junior Python Developer",
+          "location": "Zurich",
+          "company": "Tech Studio",
+          "from_date": "2024-06-01",
+          "to_date": null,
+          "description": "Developed backend APIs and worked with databases."
+        }
+      ],
+      "scientific_interests": [
+        {
+          "name": "Artificial Intelligence",
+          "description": "Interested in machine learning and backend automation."
+        }
+      ],
+      "publications": [
+        {
+          "title": "AI Future",
+          "authors": ["me"]
+        }
+      ],
+      "awards": [
+        {
+          "title": "Best Student Project",
+          "organization": "School",
+          "date": "2023-05-20",
+          "description": "Won an award for a software development project."
+        }
+      ],
+      "favorite_subjects_in_school": [
+        "mathematics",
+        "computer_science",
+        "physics"
+      ],
+      "programming_skills": [
+        {
+          "language": "Python",
+          "level": "advanced"
+        },
+        {
+          "language": "JavaScript",
+          "level": "intermediate"
+        }
+      ],
+      "device_access": {
+        "weekly_hours": 25
+      },
+      "hobbies": [
+        {
+          "name": "Coding"
+        },
+        {
+          "name": "Football"
+        }
+      ]
+}
