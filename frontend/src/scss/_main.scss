@@ -12,6 +12,7 @@ main {
         @extend %rounded-all-edges;
         max-width: 850px;
         min-height: fit-content;
+        min-height: -webkit-fit-content;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
