@@ -50,8 +50,8 @@ body {
         &:hover:not(:disabled) {
             text-decoration: none;
             transform: scale(1.05);
-            background-color: var(--quaternary-color);
-            color: var(--quinary-color);
+            background-color: var(--text-color);
+            color: var(--thirdly-color);
         }
     }
 }
