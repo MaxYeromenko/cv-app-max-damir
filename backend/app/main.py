@@ -11,6 +11,7 @@ from bson.errors import InvalidId
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, Request, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from typing import Any
 from slowapi import _rate_limit_exceeded_handler, Limiter
@@ -26,7 +27,19 @@ async def lifespan(app: FastAPI):
     yield
     await app.state.mongo_client.close()
 
+ALLOWED_ORIGINS: list[str] = [
+    "https://cv-app-max-damir.vercel.app",
+    "http://localhost:5500",
+]
+
 app = FastAPI(title="CV App", lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 limiter = Limiter(key_func=get_remote_address)
