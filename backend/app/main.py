@@ -148,7 +148,7 @@ async def get_all_user_cvs(
         cursor = cvs.find().skip(skip).limit(limit)
         items = []
         async for doc in cursor:
-            del doc["_id"]
+            doc["id"] = str(doc.pop("_id"))
             items.append(doc)
         total_count = await cvs.count_documents({})
         logger.info(f"Successfully retrieved {len(items)} CVs from db.")
