@@ -27,10 +27,16 @@ async def lifespan(app: FastAPI):
     yield
     await app.state.mongo_client.close()
 
-ALLOWED_ORIGINS: list[str] = [
-    "https://cv-app-max-damir.vercel.app",
-    "http://localhost:5500",
-]
+
+logger = logging.getLogger(__name__)
+
+_origins: str | None = os.getenv('ALLOWED_ORIGINS')
+
+if not _origins:
+    logger.error("ALLOWED_ORIGINS env var is not set")
+    raise RuntimeError("ALLOWED_ORIGINS env var is not set")
+
+ALLOWED_ORIGINS: list[str] = [o.strip() for o in _origins.split(',') if o.strip()]
 
 app = FastAPI(title="CV App", lifespan=lifespan)
 app.add_middleware(
@@ -46,9 +52,6 @@ limiter = Limiter(key_func=get_remote_address)
 
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
-
-logger = logging.getLogger(__name__)
-
 
 
 
