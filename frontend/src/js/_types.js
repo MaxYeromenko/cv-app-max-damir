@@ -1,4 +1,4 @@
-export const API_URL = "http://localhost:8000/api/v1/user-cv";
+export const API_URL = "https://api-cv-app-max-damir.onrender.com/api/v1/users-cvs";
 export const FALLBACK_PHOTO = "./public/cv.svg";
 export const GENDER_LABELS = {
     male: "Чоловіча",
