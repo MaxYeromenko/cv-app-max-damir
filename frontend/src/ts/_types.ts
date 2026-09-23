@@ -106,7 +106,7 @@ export interface ApiResponse {
     items: UserCV[];
 }
 
-export const API_URL = "http://localhost:8000/api/v1/user-cv";
+export const API_URL = "https://api-cv-app-max-damir.onrender.com";
 export const FALLBACK_PHOTO = "./public/cv.svg";
 
 export const GENDER_LABELS: Record<Gender, string> = {
