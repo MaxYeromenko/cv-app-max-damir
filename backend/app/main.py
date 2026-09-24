@@ -13,10 +13,12 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Query, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
+from fastapi.responses import PlainTextResponse
 from typing import Any
 from slowapi import _rate_limit_exceeded_handler, Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
+import yaml
 
 load_dotenv()
 
@@ -38,7 +40,48 @@ if not _origins:
 
 ALLOWED_ORIGINS: list[str] = [o.strip() for o in _origins.split(',') if o.strip()]
 
-app = FastAPI(title="CV App", lifespan=lifespan)
+description_text = """
+Це серверне RESTful API для додатка **CV App**, побудоване на базі специфікації OpenAPI 3.1.0. 
+Більше інформації про інтерактивну документацію можна знайти на [Swagger](https://swagger.io/). 
+
+Цей проєкт призначений для створення та управління базою даних резюме користувачів. Він підтримує розширені моделі для опису досвіду роботи, навичок програмування, володіння мовами та наукових інтересів. Завдяки строгій типізації та валідації (через Pydantic), дані зручно серіалізуються для збереження в базі (включаючи роботу з ObjectId у MongoDB). Ви можете тестувати всі доступні ендпоінти та взаємодіяти з API безпосередньо у цьому інтерфейсі.
+
+Деякі корисні посилання:
+- [Production сервер додатка](https://api-cv-app-max-damir.onrender.com/)
+- [Офіційна документація FastAPI](https://fastapi.tiangolo.com/)
+- [Специфікація OpenAPI 3.1.0](https://spec.openapis.org/oas/v3.1.0.html)
+"""
+
+tags_metadata = [
+    {
+        "name": "root",
+        "description": "Перевірка статусу сервера",
+    },
+    {
+        "name": "users-cvs",
+        "description": "Операції з резюме користувачів (CRUD)",
+    },
+]
+
+app = FastAPI(
+    title="CV App",
+    version="0.1.0",
+    description=description_text,
+    contact={
+        "name": "Support Team",
+        "email": "maks.damir.itshi251@gmail.com",
+    },
+    license_info={
+        "name": "MIT",
+    },
+    openapi_tags=tags_metadata,
+    servers=[
+        {"url": "https://api-cv-app-max-damir.onrender.com/", "description": "Production сервер (Render)"},
+        {"url": "http://localhost:5500/", "description": "Локальний сервер для розробки"}
+    ],
+    lifespan=lifespan
+)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
@@ -100,7 +143,7 @@ async def validate_fields_to_update(cvs, _id: ObjectId, fields_to_update: dict[s
 
     return validated_fields_to_update
 
-@app.get("/")
+@app.get("/", tags=["root"])
 @limiter.limit("30/minute")
 async def root(request: Request):
 
@@ -109,7 +152,7 @@ async def root(request: Request):
         "status":"ok"
     }
 
-@app.get("/api/v1/users-cvs/{user_id}", response_model=UserCVResponse)
+@app.get("/api/v1/users-cvs/{user_id}", response_model=UserCVResponse, tags=["users-cvs"])
 @limiter.limit("30/minute")
 async def get_user_cv(
         request: Request,
@@ -136,7 +179,7 @@ async def get_user_cv(
     logger.info("Successfully got doc from db.")
     return result
 
-@app.get("/api/v1/users-cvs")
+@app.get("/api/v1/users-cvs", tags=["users-cvs"])
 @limiter.limit("20/minute")
 async def get_all_user_cvs(
         request: Request,
@@ -162,7 +205,7 @@ async def get_all_user_cvs(
         logger.error("Failed to get CV list from db.", exc_info=err)
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@app.post("/api/v1/users-cvs")
+@app.post("/api/v1/users-cvs", tags=["users-cvs"])
 @limiter.limit("30/minute")
 async def create_user_cv(
         request: Request,
@@ -183,7 +226,7 @@ async def create_user_cv(
     logger.info("Successfully created doc in db.")
     return answer
 
-@app.put("/api/v1/users-cvs/{user_id}")
+@app.put("/api/v1/users-cvs/{user_id}", tags=["users-cvs"])
 @limiter.limit("30/minute")
 async def update_user_cv(
         request: Request,
@@ -237,7 +280,7 @@ async def update_user_cv(
     logger.info("Successfully updated doc in db.")
     return answer
 
-@app.delete("/api/v1/users-cvs/{user_id}")
+@app.delete("/api/v1/users-cvs/{user_id}", tags=["users-cvs"])
 @limiter.limit("30/minute")
 async def delete_user_cv(
         request: Request,
@@ -266,3 +309,14 @@ async def delete_user_cv(
     }
     logger.info("Successfully deleted doc from db.")
     return answer
+
+@app.get("/openapi.yaml", include_in_schema=False)
+def get_openapi_yaml(request: Request):
+    openapi_data = app.openapi()
+    yaml_data = yaml.dump(
+        openapi_data, 
+        sort_keys=False,
+        allow_unicode=True,
+        default_flow_style=False
+    )
+    return PlainTextResponse(yaml_data, media_type="text/yaml")

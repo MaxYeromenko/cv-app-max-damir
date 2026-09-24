@@ -1,0 +1,642 @@
+openapi: 3.1.0
+info:
+    title: CV App
+    description: |-
+        Це серверне RESTful API для додатка **CV App**, побудоване на базі специфікації OpenAPI 3.1.0. 
+        Більше інформації про інтерактивну документацію можна знайти на [Swagger](https://swagger.io/). 
+
+        Цей проєкт призначений для створення та управління базою даних резюме користувачів. Він підтримує розширені моделі для опису досвіду роботи, навичок програмування, володіння мовами та наукових інтересів. Завдяки строгій типізації та валідації (через Pydantic), дані зручно серіалізуються для збереження в базі (включаючи роботу з ObjectId у MongoDB). Ви можете тестувати всі доступні ендпоінти та взаємодіяти з API безпосередньо у цьому інтерфейсі.
+
+        Деякі корисні посилання:
+        - [Production сервер додатка](https://api-cv-app-max-damir.onrender.com/)
+        - [Офіційна документація FastAPI](https://fastapi.tiangolo.com/)
+        - [Специфікація OpenAPI 3.1.0](https://spec.openapis.org/oas/v3.1.0.html)
+    contact:
+        name: Support Team
+        email: maks.damir.itshi251@gmail.com
+    license:
+        name: MIT
+    version: 0.1.0
+servers:
+    - url: https://api-cv-app-max-damir.onrender.com/
+      description: Production сервер (Render)
+    - url: http://localhost:5500/
+      description: Локальний сервер для розробки
+tags:
+    - name: root
+      description: Перевірка статусу сервера
+    - name: users-cvs
+      description: Операції з резюме користувачів (CRUD)
+paths:
+    /:
+        get:
+            tags:
+                - root
+            summary: Root
+            operationId: root__get
+            responses:
+                "200":
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema: {}
+    /api/v1/users-cvs/{user_id}:
+        get:
+            tags:
+                - users-cvs
+            summary: Get User Cv
+            operationId: get_user_cv_api_v1_users_cvs__user_id__get
+            parameters:
+                - name: user_id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      title: User Id
+            responses:
+                "200":
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/UserCVResponse"
+                "422":
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/HTTPValidationError"
+        put:
+            tags:
+                - users-cvs
+            summary: Update User Cv
+            operationId: update_user_cv_api_v1_users_cvs__user_id__put
+            parameters:
+                - name: user_id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      title: User Id
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            additionalProperties: true
+                            title: Fields To Update
+            responses:
+                "200":
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                additionalProperties: true
+                                title: Response Update User Cv Api V1 Users Cvs  User Id  Put
+                "422":
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/HTTPValidationError"
+        delete:
+            tags:
+                - users-cvs
+            summary: Delete User Cv
+            operationId: delete_user_cv_api_v1_users_cvs__user_id__delete
+            parameters:
+                - name: user_id
+                  in: path
+                  required: true
+                  schema:
+                      type: string
+                      title: User Id
+            responses:
+                "200":
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                additionalProperties:
+                                    type: string
+                                title: Response Delete User Cv Api V1 Users Cvs  User Id  Delete
+                "422":
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/HTTPValidationError"
+    /api/v1/users-cvs:
+        get:
+            tags:
+                - users-cvs
+            summary: Get All User Cvs
+            operationId: get_all_user_cvs_api_v1_users_cvs_get
+            parameters:
+                - name: skip
+                  in: query
+                  required: false
+                  schema:
+                      type: integer
+                      default: 0
+                      title: Skip
+                - name: limit
+                  in: query
+                  required: false
+                  schema:
+                      type: integer
+                      maximum: 100
+                      default: 10
+                      title: Limit
+            responses:
+                "200":
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                additionalProperties:
+                                    anyOf:
+                                        - type: integer
+                                        - type: array
+                                          items:
+                                              type: object
+                                              additionalProperties: true
+                                title: Response Get All User Cvs Api V1 Users Cvs Get
+                "422":
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/HTTPValidationError"
+        post:
+            tags:
+                - users-cvs
+            summary: Create User Cv
+            operationId: create_user_cv_api_v1_users_cvs_post
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/UserCVRequest"
+            responses:
+                "200":
+                    description: Successful Response
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                additionalProperties:
+                                    type: string
+                                title: Response Create User Cv Api V1 Users Cvs Post
+                "422":
+                    description: Validation Error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/HTTPValidationError"
+components:
+    schemas:
+        Award:
+            properties:
+                title:
+                    type: string
+                    maxLength: 100
+                    minLength: 1
+                    title: Title
+                organization:
+                    anyOf:
+                        - type: string
+                          maxLength: 100
+                        - type: "null"
+                    title: Organization
+                date:
+                    anyOf:
+                        - type: string
+                          format: date
+                        - type: "null"
+                    title: Date
+                description:
+                    anyOf:
+                        - type: string
+                          maxLength: 300
+                          minLength: 10
+                        - type: "null"
+                    title: Description
+            additionalProperties: false
+            type: object
+            required:
+                - title
+            title: Award
+        DeviceAccess:
+            properties:
+                weekly_hours:
+                    type: number
+                    minimum: 0
+                    title: Weekly Hours
+            additionalProperties: false
+            type: object
+            required:
+                - weekly_hours
+            title: DeviceAccess
+        Gender:
+            type: string
+            enum:
+                - male
+                - female
+                - other
+            title: Gender
+        HTTPValidationError:
+            properties:
+                detail:
+                    items:
+                        $ref: "#/components/schemas/ValidationError"
+                    type: array
+                    title: Detail
+            type: object
+            title: HTTPValidationError
+        Hobby:
+            properties:
+                name:
+                    type: string
+                    maxLength: 50
+                    minLength: 1
+                    title: Name
+            additionalProperties: false
+            type: object
+            required:
+                - name
+            title: Hobby
+        Job:
+            properties:
+                job_title:
+                    type: string
+                    maxLength: 50
+                    minLength: 1
+                    title: Job Title
+                location:
+                    type: string
+                    maxLength: 50
+                    minLength: 1
+                    title: Location
+                company:
+                    type: string
+                    maxLength: 50
+                    minLength: 1
+                    title: Company
+                from_date:
+                    type: string
+                    format: date
+                    title: From Date
+                to_date:
+                    anyOf:
+                        - type: string
+                          format: date
+                        - type: "null"
+                    title: To Date
+                description:
+                    anyOf:
+                        - type: string
+                          maxLength: 300
+                          minLength: 10
+                        - type: "null"
+                    title: Description
+            additionalProperties: false
+            type: object
+            required:
+                - job_title
+                - location
+                - company
+                - from_date
+            title: Job
+        Language:
+            properties:
+                name:
+                    type: string
+                    maxLength: 30
+                    minLength: 1
+                    title: Name
+                proficiency:
+                    $ref: "#/components/schemas/ProficiencyLevel"
+            additionalProperties: false
+            type: object
+            required:
+                - name
+                - proficiency
+            title: Language
+        ProficiencyLevel:
+            type: string
+            enum:
+                - beginner
+                - elementary
+                - intermediate
+                - upper_intermediate
+                - advanced
+                - native
+            title: ProficiencyLevel
+        ProgrammingLevel:
+            type: string
+            enum:
+                - beginner
+                - intermediate
+                - advanced
+                - expert
+            title: ProgrammingLevel
+        ProgrammingSkill:
+            properties:
+                language:
+                    type: string
+                    maxLength: 50
+                    minLength: 1
+                    title: Language
+                level:
+                    $ref: "#/components/schemas/ProgrammingLevel"
+            additionalProperties: false
+            type: object
+            required:
+                - language
+                - level
+            title: ProgrammingSkill
+        Publication:
+            properties:
+                title:
+                    type: string
+                    maxLength: 200
+                    minLength: 1
+                    title: Title
+                journal:
+                    anyOf:
+                        - type: string
+                          maxLength: 100
+                        - type: "null"
+                    title: Journal
+                publication_date:
+                    anyOf:
+                        - type: string
+                          format: date
+                        - type: "null"
+                    title: Publication Date
+                authors:
+                    items:
+                        type: string
+                    type: array
+                    title: Authors
+                url:
+                    anyOf:
+                        - type: string
+                        - type: "null"
+                    title: Url
+            additionalProperties: false
+            type: object
+            required:
+                - title
+            title: Publication
+        SchoolSubject:
+            type: string
+            enum:
+                - mathematics
+                - physics
+                - chemistry
+                - biology
+                - computer_science
+                - history
+                - geography
+                - literature
+                - english
+                - other
+            title: SchoolSubject
+        ScientificInterest:
+            properties:
+                name:
+                    type: string
+                    maxLength: 100
+                    minLength: 1
+                    title: Name
+                description:
+                    anyOf:
+                        - type: string
+                          maxLength: 300
+                          minLength: 10
+                        - type: "null"
+                    title: Description
+            additionalProperties: false
+            type: object
+            required:
+                - name
+            title: ScientificInterest
+        UserCVRequest:
+            properties:
+                photo:
+                    anyOf:
+                        - type: string
+                        - type: "null"
+                    title: Photo
+                personal_info:
+                    $ref: "#/components/schemas/UserPersonalInfo"
+                languages:
+                    items:
+                        $ref: "#/components/schemas/Language"
+                    type: array
+                    title: Languages
+                work_experience:
+                    items:
+                        $ref: "#/components/schemas/Job"
+                    type: array
+                    title: Work Experience
+                scientific_interests:
+                    items:
+                        $ref: "#/components/schemas/ScientificInterest"
+                    type: array
+                    title: Scientific Interests
+                publications:
+                    items:
+                        $ref: "#/components/schemas/Publication"
+                    type: array
+                    title: Publications
+                awards:
+                    items:
+                        $ref: "#/components/schemas/Award"
+                    type: array
+                    title: Awards
+                favorite_subjects_in_school:
+                    items:
+                        $ref: "#/components/schemas/SchoolSubject"
+                    type: array
+                    title: Favorite Subjects In School
+                programming_skills:
+                    items:
+                        $ref: "#/components/schemas/ProgrammingSkill"
+                    type: array
+                    title: Programming Skills
+                device_access:
+                    $ref: "#/components/schemas/DeviceAccess"
+                hobbies:
+                    items:
+                        $ref: "#/components/schemas/Hobby"
+                    type: array
+                    title: Hobbies
+            additionalProperties: false
+            type: object
+            required:
+                - personal_info
+                - languages
+                - work_experience
+                - scientific_interests
+                - publications
+                - awards
+                - favorite_subjects_in_school
+                - programming_skills
+                - device_access
+                - hobbies
+            title: UserCVRequest
+        UserCVResponse:
+            properties:
+                photo:
+                    anyOf:
+                        - type: string
+                        - type: "null"
+                    title: Photo
+                personal_info:
+                    $ref: "#/components/schemas/UserPersonalInfo"
+                languages:
+                    items:
+                        $ref: "#/components/schemas/Language"
+                    type: array
+                    title: Languages
+                work_experience:
+                    items:
+                        $ref: "#/components/schemas/Job"
+                    type: array
+                    title: Work Experience
+                scientific_interests:
+                    items:
+                        $ref: "#/components/schemas/ScientificInterest"
+                    type: array
+                    title: Scientific Interests
+                publications:
+                    items:
+                        $ref: "#/components/schemas/Publication"
+                    type: array
+                    title: Publications
+                awards:
+                    items:
+                        $ref: "#/components/schemas/Award"
+                    type: array
+                    title: Awards
+                favorite_subjects_in_school:
+                    items:
+                        $ref: "#/components/schemas/SchoolSubject"
+                    type: array
+                    title: Favorite Subjects In School
+                programming_skills:
+                    items:
+                        $ref: "#/components/schemas/ProgrammingSkill"
+                    type: array
+                    title: Programming Skills
+                device_access:
+                    $ref: "#/components/schemas/DeviceAccess"
+                hobbies:
+                    items:
+                        $ref: "#/components/schemas/Hobby"
+                    type: array
+                    title: Hobbies
+            additionalProperties: false
+            type: object
+            required:
+                - personal_info
+                - languages
+                - work_experience
+                - scientific_interests
+                - publications
+                - awards
+                - favorite_subjects_in_school
+                - programming_skills
+                - device_access
+                - hobbies
+            title: UserCVResponse
+        UserPersonalInfo:
+            properties:
+                first_name:
+                    type: string
+                    maxLength: 20
+                    minLength: 1
+                    title: First Name
+                last_name:
+                    type: string
+                    maxLength: 20
+                    minLength: 1
+                    title: Last Name
+                preferred_name:
+                    anyOf:
+                        - type: string
+                          maxLength: 20
+                          minLength: 1
+                        - type: "null"
+                    title: Preferred Name
+                email:
+                    type: string
+                    format: email
+                    title: Email
+                phone:
+                    type: string
+                    maxLength: 15
+                    minLength: 10
+                    title: Phone
+                date_of_birth:
+                    type: string
+                    format: date
+                    title: Date Of Birth
+                nationality:
+                    type: string
+                    maxLength: 20
+                    minLength: 1
+                    title: Nationality
+                country_of_residence:
+                    type: string
+                    maxLength: 30
+                    minLength: 1
+                    title: Country Of Residence
+                gender:
+                    $ref: "#/components/schemas/Gender"
+            additionalProperties: false
+            type: object
+            required:
+                - first_name
+                - last_name
+                - email
+                - phone
+                - date_of_birth
+                - nationality
+                - country_of_residence
+                - gender
+            title: UserPersonalInfo
+        ValidationError:
+            properties:
+                loc:
+                    items:
+                        anyOf:
+                            - type: string
+                            - type: integer
+                    type: array
+                    title: Location
+                msg:
+                    type: string
+                    title: Message
+                type:
+                    type: string
+                    title: Error Type
+                input:
+                    title: Input
+                ctx:
+                    type: object
+                    title: Context
+            type: object
+            required:
+                - loc
+                - msg
+                - type
+            title: ValidationError
