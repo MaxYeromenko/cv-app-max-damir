@@ -143,3 +143,5 @@ export const SUBJECT_LABELS: Record<SchoolSubject, string> = {
     english: "Англійська мова",
     other: "Інше",
 };
+
+export type Theme = 'light' | 'dark';

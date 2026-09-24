@@ -1,7 +1,9 @@
 import { init as initFooter } from "./_footer";
 import { init as initMain } from "./_main";
+import { init as initHeader } from "./_header";
 
 document.addEventListener("DOMContentLoaded", () => {
+    initHeader();
     initFooter();
     initMain();
 

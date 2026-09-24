@@ -12,17 +12,40 @@ header {
     }
 
     .logo-container {
-        &:hover {
-            transform: scale(1.05);
-        }
-
-        svg {
+        .logo {
             aspect-ratio: 1/1;
             width: 40px;
         }
 
         a {
             font-size: 1.25rem;
+        }
+
+        .theme-toggle-btn {
+            background: transparent;
+            border: none;
+            padding: 8px;
+            border-radius: 50%;
+            width: fit-content;
+            height: fit-content;
+            line-height: 0;
+            cursor: pointer;
+
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+
+            &:active svg {
+                transform: rotate(45deg);
+            }
+
+            &:focus {
+                outline: 2px solid var(--quinary-color);
+            }
+
+            svg {
+                transition: transform 0.3s;
+            }
         }
     }
 
@@ -37,8 +60,9 @@ header {
     }
 }
 
-@media(max-width:460px) {
+@media(max-width:655px) {
     header {
         flex-direction: column;
+        text-align: center;
     }
 }
