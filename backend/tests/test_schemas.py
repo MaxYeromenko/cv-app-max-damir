@@ -38,7 +38,7 @@ def test_invalid_payload(payload):
 @pytest.mark.parametrize('field', [
     'first_name',
     'last_name',
-    'nationality'
+    'nationality',
     'phone'
 ])
 def test_too_short_fields(payload, field):

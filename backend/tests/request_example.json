@@ -1,9 +1,9 @@
 {
       "photo": null,
       "personal_info": {
-        "first_name": "Damir",
-        "last_name": "Max",
-        "email": "damir@example.com",
+        "first_name": "John",
+        "last_name": "Peterson",
+        "email": "email@example.com",
         "phone": "+41791234567",
         "date_of_birth": "2005-04-15",
         "nationality": "Swiss",
