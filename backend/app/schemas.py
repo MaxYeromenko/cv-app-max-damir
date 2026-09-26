@@ -172,5 +172,5 @@ class UserCVRequest(BaseModel):
     hobbies: list[Hobby]
 
 class UserCVResponse(UserCVRequest):
-    pass
+    id: str | None = None
 
