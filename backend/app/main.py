@@ -25,7 +25,7 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.mongo_client = create_mongo_client(os.getenv("MONGODB_URI"))
-    app.state.cvs = app.state.mongo_client["users"]["cvs"]
+    app.state.db = app.state.mongo_client["users"]["cvs"]
     yield
     await app.state.mongo_client.close()
 
@@ -311,6 +311,7 @@ async def delete_user_cv(
     return answer
 
 @app.get("/openapi.yaml", include_in_schema=False)
+@limiter.limit("10/minute")
 def get_openapi_yaml(request: Request):
     openapi_data = app.openapi()
     yaml_data = yaml.dump(
