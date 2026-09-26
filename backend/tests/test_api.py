@@ -9,6 +9,7 @@ from httpx import AsyncClient, ASGITransport
 async def client():
     async with LifespanManager(app):
         app.state.db.collection = app.state.db["collection_for_api_tests"]
+        await app.state.db.collection.delete_many({})
         async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as async_client:
             yield async_client
         await app.state.db.collection.delete_many({})
