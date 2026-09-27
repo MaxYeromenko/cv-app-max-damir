@@ -25,7 +25,8 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.mongo_client = create_mongo_client(os.getenv("MONGODB_URI"))
-    app.state.cvs = app.state.mongo_client["users"]["cvs"]
+    app.state.db = app.state.mongo_client["users"]
+    app.state.db.collection = app.state.db["cvs"]
     yield
     await app.state.mongo_client.close()
 
@@ -109,8 +110,8 @@ def get_by_dot_path(doc: dict[str, Any], path: str) -> Any:
 
       return current
 
-def get_cvs_collection(request: Request):
-    return request.app.state.cvs
+def get_collection(request: Request):
+    return request.app.state.db.collection
 
 async def validate_fields_to_update(cvs, _id: ObjectId, fields_to_update: dict[str, Any]) -> dict[str, Any]:
     fields = fields_to_update.keys()
@@ -157,7 +158,7 @@ async def root(request: Request):
 async def get_user_cv(
         request: Request,
         user_id: str,
-        cvs = Depends(get_cvs_collection)
+        cvs = Depends(get_collection)
 ):
     try:
         _id = ObjectId(user_id)
@@ -185,7 +186,7 @@ async def get_all_user_cvs(
         request: Request,
         skip: int = 0,
         limit: int = Query(le=100, default=10),
-        cvs = Depends(get_cvs_collection)
+        cvs = Depends(get_collection)
 ) -> dict[str, int | list[dict[str, Any]]]:
      try:
         cursor = cvs.find().skip(skip).limit(limit)
@@ -210,7 +211,7 @@ async def get_all_user_cvs(
 async def create_user_cv(
         request: Request,
         user_cv: UserCVRequest,
-        cvs = Depends(get_cvs_collection)
+        cvs = Depends(get_collection)
 
 ) -> dict[str, str]:
     try:
@@ -232,7 +233,7 @@ async def update_user_cv(
         request: Request,
         user_id: str,
         fields_to_update: dict[str, Any],
-        cvs = Depends(get_cvs_collection)
+        cvs = Depends(get_collection)
 
 ) -> dict[str, Any]:
     try:
@@ -285,7 +286,7 @@ async def update_user_cv(
 async def delete_user_cv(
         request: Request,
         user_id: str,
-        cvs = Depends(get_cvs_collection)
+        cvs = Depends(get_collection)
 ) -> dict[str, str]:
     try:
         _id = ObjectId(user_id)
@@ -311,6 +312,7 @@ async def delete_user_cv(
     return answer
 
 @app.get("/openapi.yaml", include_in_schema=False)
+@limiter.limit("10/minute")
 def get_openapi_yaml(request: Request):
     openapi_data = app.openapi()
     yaml_data = yaml.dump(

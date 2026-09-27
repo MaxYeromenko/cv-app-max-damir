@@ -8,11 +8,17 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-@pytest_asyncio.fixture
-async def collection():
+@pytest_asyncio.fixture(scope="session")
+async def mongo_client():
     async with AsyncMongoClient(os.getenv("MONGODB_URI")) as client:
-        coll = client["users"]["test_cvs"]
-        yield coll
+        yield client
+
+@pytest_asyncio.fixture
+async def collection(mongo_client):
+    coll = mongo_client["users"]["collection_for_db_tests"]
+    await coll.delete_many({})
+    yield coll
+    await coll.delete_many({})
 
 
 @pytest_asyncio.fixture
@@ -20,13 +26,6 @@ async def _id(collection):
     result = await collection.insert_one({"name": "John", "age": 21, "city": "California"})
     yield result.inserted_id
 
-
-
-
-@pytest.mark.db_test
-@pytest.mark.db_normal_case
-async def test_collection_name(collection):
-    assert collection.name == "test_cvs"
 
 
 
