@@ -184,7 +184,7 @@ paths:
                         schema:
                             $ref: "#/components/schemas/UserCVRequest"
             responses:
-                "200":
+                "201":
                     description: Successful Response
                     content:
                         application/json:
