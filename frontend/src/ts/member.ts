@@ -88,6 +88,32 @@ document.addEventListener("DOMContentLoaded", () => {
         container.textContent = items.map(formatFn).join(", ");
     }
 
+    function initPhotoModal(photo: HTMLImageElement): void {
+        const modal = document.getElementById("photo-modal") as HTMLDialogElement | null;
+        const modalImg = document.getElementById("modal-photo-img") as HTMLImageElement | null;
+
+        if (!modal || !modalImg) return;
+
+        const closeModal = () => {
+            if (modal.open) {
+                modal.close();
+                window.removeEventListener("scroll", closeModal);
+                window.removeEventListener("wheel", closeModal);
+            }
+        };
+
+        photo.addEventListener("click", () => {
+            modalImg.src = photo.src;
+            modalImg.alt = photo.alt || "Фото учасника";
+            modal.showModal();
+            window.addEventListener("scroll", closeModal, { passive: true, once: true });
+            window.addEventListener("wheel", closeModal, { passive: true, once: true });
+        });
+
+        modal.addEventListener("click", closeModal);
+        modal.addEventListener("mouseleave", closeModal);
+    }
+
     function populateDOM(cv: UserCV): void {
         const pInfo = cv.personal_info;
 
@@ -95,6 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (photoEl) {
             photoEl.src = cv.photo || FALLBACK_PHOTO;
             photoEl.onerror = () => { photoEl.src = FALLBACK_PHOTO; };
+            initPhotoModal(photoEl);
         }
 
         setElementText("cv-name", `${pInfo.first_name} ${pInfo.last_name}`);

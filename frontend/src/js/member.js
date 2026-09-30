@@ -59,12 +59,35 @@ document.addEventListener("DOMContentLoaded", () => {
         container.classList.remove("fadedText");
         container.textContent = items.map(formatFn).join(", ");
     }
+    function initPhotoModal(photo) {
+        const modal = document.getElementById("photo-modal");
+        const modalImg = document.getElementById("modal-photo-img");
+        if (!modal || !modalImg)
+            return;
+        const closeModal = () => {
+            if (modal.open) {
+                modal.close();
+                window.removeEventListener("scroll", closeModal);
+                window.removeEventListener("wheel", closeModal);
+            }
+        };
+        photo.addEventListener("click", () => {
+            modalImg.src = photo.src;
+            modalImg.alt = photo.alt || "Фото учасника";
+            modal.showModal();
+            window.addEventListener("scroll", closeModal, { passive: true, once: true });
+            window.addEventListener("wheel", closeModal, { passive: true, once: true });
+        });
+        modal.addEventListener("click", closeModal);
+        modal.addEventListener("mouseleave", closeModal);
+    }
     function populateDOM(cv) {
         const pInfo = cv.personal_info;
         const photoEl = document.getElementById("cv-photo");
         if (photoEl) {
             photoEl.src = cv.photo || FALLBACK_PHOTO;
             photoEl.onerror = () => { photoEl.src = FALLBACK_PHOTO; };
+            initPhotoModal(photoEl);
         }
         setElementText("cv-name", `${pInfo.first_name} ${pInfo.last_name}`);
         setElementText("cv-preferred-name", pInfo.preferred_name ? `(Також відомий як: ${pInfo.preferred_name})` : "");
