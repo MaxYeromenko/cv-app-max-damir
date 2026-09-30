@@ -39,7 +39,8 @@ paths:
                     description: Successful Response
                     content:
                         application/json:
-                            schema: {}
+                            example:
+                                status: ok
     /api/v1/users-cvs/{user_id}:
         get:
             tags:
@@ -58,14 +59,97 @@ paths:
                     description: Successful Response
                     content:
                         application/json:
-                            schema:
-                                $ref: "#/components/schemas/UserCVResponse"
-                "422":
+                            example:
+                                photo: null
+                                personal_info:
+                                    first_name: John
+                                    last_name: Peterson
+                                    email: email@example.com
+                                    phone: "+41791234567"
+                                    date_of_birth: '2005-04-15'
+                                    nationality: Swiss
+                                    country_of_residence: Switzerland
+                                    gender: male
+                                languages: [
+                                    {
+                                        name: English,
+                                        proficiency: advanced
+                                    },
+                                    {
+                                        name: Russian,
+                                        proficiency: native
+                                    }
+                                ]
+                                work_experience: [
+                                    {
+                                        job_title: Junior Python Developer,
+                                        location: Zurich,
+                                        company: Tech Studio,
+                                        from_date: '2024-06-01',
+                                        to_date: '2024-09-012',
+                                        description: Developed backend APIs and worked with databases.
+                                    }
+                                ]
+                                scientific_interests: [
+                                    {
+                                        name: Artificial Intelligence,
+                                        description: Interested in machine learning and backend automation.
+                                    }
+                                ]
+                                publications: [
+                                    {
+                                        title: AI Future,
+                                        authors: [me]
+                                    }
+                                ]
+                                awards: [
+                                    {
+                                        title: Best Student Project,
+                                        organization: School,
+                                        date: '2023-05-20',
+                                        description: Won an award for a software development project.
+                                    }
+                                ]
+                                favorite_subjects_in_school: [
+                                    mathematics,
+                                    computer_science,
+                                    physics
+                                ]
+                                programming_skills: [
+                                    {
+                                        language: Python,
+                                        level: advanced
+                                    },
+                                    {
+                                        language: JavaScript,
+                                        level: intermediate
+                                    }
+                                ]
+                                device_access:
+                                    weekly_hours: 25
+                                hobbies: [
+                                    name: Coding,
+                                    name: Football
+                                ]
+                "400":
                     description: Validation Error
                     content:
                         application/json:
-                            schema:
-                                $ref: "#/components/schemas/HTTPValidationError"
+                            example:
+                                detail: 1 is not a valid ObjectId, it must be a 12-byte input or a 24-character hex string
+
+                "404":
+                    description: HTTPValidationError
+                    content:
+                        application/json:
+                            example:
+                                detail: CV not found.
+                "500":
+                    description: Internal Server Error
+                    content:
+                        application/json:
+                            example:
+                                detail: Internal Server Error.
         put:
             tags:
                 - users-cvs
@@ -86,6 +170,10 @@ paths:
                             type: object
                             additionalProperties: true
                             title: Fields To Update
+                        example:
+                            personal_info.last_name: "Peterson"
+                            personal_info.age: 19
+
             responses:
                 "200":
                     description: Successful Response
@@ -95,12 +183,54 @@ paths:
                                 type: object
                                 additionalProperties: true
                                 title: Response Update User Cv Api V1 Users Cvs  User Id  Put
-                "422":
+                            example:
+                                id: 507f1f77bcf86cd799439011
+                                status: updated
+                                updated_fields:
+                                    personal_info.last_name: "Peterson"
+                                    personal_info.age: 19
+
+                "400":
                     description: Validation Error
                     content:
                         application/json:
-                            schema:
-                                $ref: "#/components/schemas/HTTPValidationError"
+                            example:
+                                detail: 1 is not a valid ObjectId, it must be a 12-byte input or a 24-character hex string
+
+
+                "422":
+                    description: HTTPValidationError
+                    content:
+                        application/json:
+                            example:
+                                message: Some fields are not valid update paths.
+                                invalid_fields: ['house_number', 'relatives']
+                                allowed_fields: [
+                                    "photo",
+
+                                    "personal_info.first_name",
+                                    "personal_info.last_name",
+                                    "personal_info.preferred_name",
+                                    "personal_info.email",
+                                    "personal_info.phone",
+                                    "personal_info.date_of_birth",
+                                    "personal_info.nationality",
+                                    "personal_info.country_of_residence",
+                                    "personal_info.gender",
+
+                                    "languages",
+                                    "work_experience",
+                                    "scientific_interests",
+                                    "publications",
+                                    "awards",
+                                    "favorite_subjects_in_school",
+                                    "programming_skills",
+
+                                    "device_access.weekly_hours",
+
+                                    "hobbies",
+                                ]
+
         delete:
             tags:
                 - users-cvs
@@ -123,12 +253,29 @@ paths:
                                 additionalProperties:
                                     type: string
                                 title: Response Delete User Cv Api V1 Users Cvs  User Id  Delete
-                "422":
+                            example:
+                                id: 507f1f77bcf86cd799439011
+                                status: deleted
+                "400":
                     description: Validation Error
                     content:
                         application/json:
-                            schema:
-                                $ref: "#/components/schemas/HTTPValidationError"
+                            example:
+                                detail: 1 is not a valid ObjectId, it must be a 12-byte input or a 24-character hex string
+                "404":
+                    description: HTTPValidationError
+                    content:
+                        application/json:
+                            example:
+                                detail: CV not found.
+                "500":
+                    description: Internal Server Error
+                    content:
+                        application/json:
+                            example:
+                                detail: Internal Server Error.
+
+
     /api/v1/users-cvs:
         get:
             tags:
@@ -166,12 +313,17 @@ paths:
                                               type: object
                                               additionalProperties: true
                                 title: Response Get All User Cvs Api V1 Users Cvs Get
-                "422":
-                    description: Validation Error
+                            example:
+                                total: 0
+                                skip: 0
+                                limit: 10
+                                items: []
+                "500":
+                    description: Internal Server Error
                     content:
                         application/json:
-                            schema:
-                                $ref: "#/components/schemas/HTTPValidationError"
+                            example:
+                                detail: Internal Server Error.
         post:
             tags:
                 - users-cvs
@@ -181,8 +333,78 @@ paths:
                 required: true
                 content:
                     application/json:
-                        schema:
-                            $ref: "#/components/schemas/UserCVRequest"
+                        example:
+                            photo: null
+                            personal_info:
+                                first_name: John
+                                last_name: Peterson
+                                email: email@example.com
+                                phone: "+41791234567"
+                                date_of_birth: '2005-04-15'
+                                nationality: Swiss
+                                country_of_residence: Switzerland
+                                gender: male
+                            languages: [
+                                {
+                                    name: English,
+                                    proficiency: advanced
+                                },
+                                {
+                                    name: Russian,
+                                    proficiency: native
+                                }
+                            ]
+                            work_experience: [
+                                {
+                                    job_title: Junior Python Developer,
+                                    location: Zurich,
+                                    company: Tech Studio,
+                                    from_date: '2024-06-01',
+                                    to_date: '2024-09-012',
+                                    description: Developed backend APIs and worked with databases.
+                                }
+                            ]
+                            scientific_interests: [
+                                {
+                                    name: Artificial Intelligence,
+                                    description: Interested in machine learning and backend automation.
+                                }
+                            ]
+                            publications: [
+                                {
+                                    title: AI Future,
+                                    authors: [ me ]
+                                }
+                            ]
+                            awards: [
+                                {
+                                    title: Best Student Project,
+                                    organization: School,
+                                    date: '2023-05-20',
+                                    description: Won an award for a software development project.
+                                }
+                            ]
+                            favorite_subjects_in_school: [
+                                mathematics,
+                                computer_science,
+                                physics
+                            ]
+                            programming_skills: [
+                                {
+                                    language: Python,
+                                    level: advanced
+                                },
+                                {
+                                    language: JavaScript,
+                                    level: intermediate
+                                }
+                            ]
+                            device_access:
+                                weekly_hours: 25
+                            hobbies: [
+                                name: Coding,
+                                name: Football
+                            ]
             responses:
                 "201":
                     description: Successful Response
@@ -193,12 +415,15 @@ paths:
                                 additionalProperties:
                                     type: string
                                 title: Response Create User Cv Api V1 Users Cvs Post
-                "422":
-                    description: Validation Error
+                            example:
+                                id: 507f1f77bcf86cd799439011
+                                status: created
+                "500":
+                    description: Internal Server Error
                     content:
                         application/json:
-                            schema:
-                                $ref: "#/components/schemas/HTTPValidationError"
+                            example:
+                                detail: Internal Server Error.
 components:
     schemas:
         Award:
