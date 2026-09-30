@@ -10,7 +10,7 @@ export function init() {
     ctx.fillStyle = "#f1f1f1";
     ctx.font = "30px Arial";
     ctx.textAlign = "center";
-    ctx.fillText("Team CV Network", canvas.width / 2, canvas.height / 2 + 10);
+    ctx.fillText("WebDUO", canvas.width / 2, canvas.height / 2 + 10);
     ctx.strokeStyle = "#66bb6a";
     ctx.lineWidth = 4;
     ctx.beginPath();
