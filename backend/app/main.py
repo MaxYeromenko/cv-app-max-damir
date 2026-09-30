@@ -171,7 +171,7 @@ async def get_user_cv(
         _id = ObjectId(user_id)
     except InvalidId as err:
         logger.error(str(err), exc_info=err)
-        raise HTTPException(status_code=422, detail=str(err))
+        raise HTTPException(status_code=400, detail=str(err))
 
     try:
         result = await cvs.find_one({"_id": _id})
