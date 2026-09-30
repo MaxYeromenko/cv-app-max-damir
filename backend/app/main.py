@@ -10,7 +10,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query, Request, Depends
+from fastapi import FastAPI, HTTPException, Query, Request, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import PlainTextResponse
@@ -144,7 +144,10 @@ async def validate_fields_to_update(cvs, _id: ObjectId, fields_to_update: dict[s
 
     return validated_fields_to_update
 
-@app.get("/", tags=["root"])
+@app.get("/",
+         tags=["root"],
+         status_code=status.HTTP_200_OK
+)
 @limiter.limit("30/minute")
 async def root(request: Request):
 
@@ -153,7 +156,11 @@ async def root(request: Request):
         "status":"ok"
     }
 
-@app.get("/api/v1/users-cvs/{user_id}", response_model=UserCVResponse, tags=["users-cvs"])
+@app.get("/api/v1/users-cvs/{user_id}",
+         response_model=UserCVResponse,
+         tags=["users-cvs"],
+         status_code=status.HTTP_200_OK
+)
 @limiter.limit("30/minute")
 async def get_user_cv(
         request: Request,
@@ -164,7 +171,7 @@ async def get_user_cv(
         _id = ObjectId(user_id)
     except InvalidId as err:
         logger.error(str(err), exc_info=err)
-        raise HTTPException(status_code=400, detail=str(err))
+        raise HTTPException(status_code=422, detail=str(err))
 
     try:
         result = await cvs.find_one({"_id": _id})
@@ -180,7 +187,10 @@ async def get_user_cv(
     logger.info("Successfully got doc from db.")
     return result
 
-@app.get("/api/v1/users-cvs", tags=["users-cvs"])
+@app.get("/api/v1/users-cvs",
+         tags=["users-cvs"],
+         status_code=status.HTTP_200_OK
+)
 @limiter.limit("20/minute")
 async def get_all_user_cvs(
         request: Request,
@@ -206,7 +216,10 @@ async def get_all_user_cvs(
         logger.error("Failed to get CV list from db.", exc_info=err)
         raise HTTPException(status_code=500, detail="Internal Server Error")
 
-@app.post("/api/v1/users-cvs", tags=["users-cvs"])
+@app.post("/api/v1/users-cvs",
+          tags=["users-cvs"],
+          status_code=status.HTTP_201_CREATED
+)
 @limiter.limit("30/minute")
 async def create_user_cv(
         request: Request,
@@ -227,14 +240,15 @@ async def create_user_cv(
     logger.info("Successfully created doc in db.")
     return answer
 
-@app.put("/api/v1/users-cvs/{user_id}", tags=["users-cvs"])
+@app.put("/api/v1/users-cvs/{user_id}",
+         tags=["users-cvs"],
+         status_code=status.HTTP_200_OK)
 @limiter.limit("30/minute")
 async def update_user_cv(
         request: Request,
         user_id: str,
         fields_to_update: dict[str, Any],
         cvs = Depends(get_collection)
-
 ) -> dict[str, Any]:
     try:
         _id = ObjectId(user_id)
@@ -281,7 +295,9 @@ async def update_user_cv(
     logger.info("Successfully updated doc in db.")
     return answer
 
-@app.delete("/api/v1/users-cvs/{user_id}", tags=["users-cvs"])
+@app.delete("/api/v1/users-cvs/{user_id}",
+            tags=["users-cvs"],
+            status_code=status.HTTP_200_OK)
 @limiter.limit("30/minute")
 async def delete_user_cv(
         request: Request,
@@ -311,7 +327,10 @@ async def delete_user_cv(
     logger.info("Successfully deleted doc from db.")
     return answer
 
-@app.get("/openapi.yaml", include_in_schema=False)
+@app.get("/openapi.yaml",
+         include_in_schema=False,
+         status_code=status.HTTP_200_OK
+)
 @limiter.limit("10/minute")
 def get_openapi_yaml(request: Request):
     openapi_data = app.openapi()
