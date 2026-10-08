@@ -2,8 +2,8 @@
 
 A web application for creating, viewing, and managing team members' resumes (CVs).
 
-[💻Link to deployed project](https://cv-app-max-damir.vercel.app)
-[📃Link to API documentation](https://api-cv-app-max-damir.onrender.com/docs)
+[💻Link to deployed project](https://cv-app-max-damir.vercel.app).  
+[📃Link to API documentation](https://api-cv-app-max-damir.onrender.com/docs).
 ## 🛠 Tech Stack
 
 | Part | Technologies |
