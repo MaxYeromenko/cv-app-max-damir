@@ -28,7 +28,7 @@ async def test_get_root(client):
 @pytest.mark.api_test_get
 async def test_get_cv(client, payload):
     response = await client.post("/api/v1/users-cvs", json=payload)
-    assert response.status_code == 200, response.text
+    assert response.status_code == 201, response.text
     _id = response.json()["id"]
 
     response = await client.get(f"/api/v1/users-cvs/{_id}")
@@ -49,7 +49,7 @@ async def test_get_cv_incorr_id(client, payload):
 @pytest.mark.api_test_get
 async def test_get_cv_unexisted_id(client, payload):
     response = await client.post("/api/v1/users-cvs", json=payload)
-    assert response.status_code == 200, response.text
+    assert response.status_code == 201, response.text
     _id = response.json()["id"]
 
     response = await client.delete(f"/api/v1/users-cvs/{_id}")
@@ -72,7 +72,7 @@ async def test_get_cvs(client, payload, skip, limit, num_of_cvs):
     _ids = []
     for _ in range(num_of_cvs):
         response = await client.post("/api/v1/users-cvs", json=payload)
-        assert response.status_code == 200, response.text
+        assert response.status_code == 201, response.text
         _ids.append(response.json()["id"])
 
 
@@ -96,7 +96,7 @@ async def test_get_cvs(client, payload, skip, limit, num_of_cvs):
 @pytest.mark.api_test_post
 async def test_post_cv(client, payload):
     response = await client.post("/api/v1/users-cvs", json=payload)
-    assert response.status_code == 200
+    assert response.status_code == 201
     data = response.json()
 
     assert "id" in data
