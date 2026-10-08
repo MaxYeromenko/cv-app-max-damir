@@ -44,3 +44,7 @@ Desktop.ini
 
 # TS Compiler
 frontend/watch.mjs
+
+# Other files and directories
+get.json
+cv_schema.json
