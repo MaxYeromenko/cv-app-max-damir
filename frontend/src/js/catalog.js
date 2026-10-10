@@ -49,10 +49,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const formattedLevel = PROFICIENCY_LABELS[l.proficiency] || l.proficiency;
             return `${escapeHtml(l.name)} — ${escapeHtml(formattedLevel)}`;
         }).join(", ") || "No languages listed";
-        const badgesHtml = (cv.programming_skills || []).slice(0, 3).map((s) => {
+        const skills = cv.programming_skills || [];
+        const badgesHtml = skills.slice(0, 2).map((s) => {
             const levelLabel = PROGRAMMING_LEVEL_LABELS[s.level] || s.level;
             return `<span class="badge">${escapeHtml(s.language)} · ${escapeHtml(levelLabel)}</span>`;
         }).join("");
+        const hiddenSkillsCount = skills.length - 2;
+        const hiddenSkillsHtml = hiddenSkillsCount > 0
+            ? `<span class="badge-overflow">+${hiddenSkillsCount} more</span>`
+            : "";
         row.innerHTML = `
             <div class="row-meta">
                 <p><strong>Location:</strong> ${location}</p>
@@ -70,6 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <p class="fadedText">${role}</p>
                     <div class="card-badges">
                         ${badgesHtml || '<span class="badge">No skills listed</span>'}
+                        ${hiddenSkillsHtml}
                     </div>
                 </div>
                     <a href="/member.html?id=${encodeURIComponent(cv.id)}" class="cta-button" rel="noopener noreferrer">View profile</a>

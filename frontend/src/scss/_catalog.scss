@@ -87,12 +87,19 @@ main.catalog-main {
                         .card-badges {
                             @extend %centered-flex;
                             margin-top: 5px;
+                            flex-wrap: wrap;
+                            max-width: 100%;
 
                             .badge {
                                 @extend %rounded-all-edges;
                                 font-size: 0.75rem;
                                 padding: 3px 8px;
                                 background-color: var(--quinary-color);
+                            }
+
+                            .badge-overflow {
+                                font-size: 0.75rem;
+                                white-space: nowrap;
                             }
                         }
                     }
