@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cvDocument = document.getElementById("cv-document");
     const exportBtn = document.getElementById("export-pdf-btn");
     if (!cvId) {
-        showError("ID резюме не вказано в URL.");
+        showError("CV ID is not specified in the URL.");
         return;
     }
     exportBtn?.addEventListener("click", () => window.print());
@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             const response = await fetch(`${API_URL}/${cvId}`);
             if (!response.ok)
-                throw new Error("Резюме не знайдено");
+                throw new Error("Resume not found.");
             const cvData = await response.json();
             populateDOM(cvData);
             statusContainer?.classList.add("hidden");
@@ -34,10 +34,10 @@ document.addEventListener("DOMContentLoaded", () => {
         loadingState?.classList.add("hidden");
         errorState?.classList.remove("hidden");
         if (errorState && msg) {
-            errorState.innerHTML = `<strong>Помилка:</strong> ${escapeHtml(msg)}`;
+            errorState.innerHTML = `<strong>Error:</strong> ${escapeHtml(msg)}`;
         }
     }
-    function renderList(containerId, items, renderFn, emptyMsg = "Немає даних") {
+    function renderList(containerId, items, renderFn, emptyMsg = "No data available") {
         const container = document.getElementById(containerId);
         if (!container)
             return;
@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         container.innerHTML = items.map(renderFn).join("");
     }
-    function renderCommaList(containerId, items, formatFn, emptyMsg = "Немає даних") {
+    function renderCommaList(containerId, items, formatFn, emptyMsg = "No data available") {
         const container = document.getElementById(containerId);
         if (!container)
             return;
@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
         };
         photo.addEventListener("click", () => {
             modalImg.src = photo.src;
-            modalImg.alt = photo.alt || "Фото учасника";
+            modalImg.alt = photo.alt || "Member's photo";
             modal.showModal();
             window.addEventListener("scroll", closeModal, { passive: true, once: true });
             window.addEventListener("wheel", closeModal, { passive: true, once: true });
@@ -90,8 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
             initPhotoModal(photoEl);
         }
         setElementText("cv-name", `${pInfo.first_name} ${pInfo.last_name}`);
-        setElementText("cv-preferred-name", pInfo.preferred_name ? `(Також відомий як: ${pInfo.preferred_name})` : "");
-        setElementText("cv-role", cv.work_experience?.[0]?.job_title || "Кандидат / Студент");
+        setElementText("cv-preferred-name", pInfo.preferred_name ? `(Also known as: ${pInfo.preferred_name})` : "");
+        setElementText("cv-role", cv.work_experience?.[0]?.job_title || "Candidate / Student");
         const emailEl = document.getElementById("cv-email");
         if (emailEl) {
             emailEl.href = `mailto:${pInfo.email}`;
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         setElementText("cv-location", `${pInfo.country_of_residence} (${pInfo.nationality})`);
         setElementText("cv-gender", GENDER_LABELS[pInfo.gender] || pInfo.gender);
-        setElementText("cv-hours", cv.device_access?.weekly_hours ? `${cv.device_access.weekly_hours} год/тижд` : "Гнучкий графік");
+        setElementText("cv-hours", cv.device_access?.weekly_hours ? `${cv.device_access.weekly_hours} h/week` : "Flexible schedule");
         renderList("cv-languages", cv.languages, (lang) => {
             const level = PROFICIENCY_LABELS[lang.proficiency] || lang.proficiency;
             return `<li><strong>${escapeHtml(lang.name)}:</strong> ${escapeHtml(level)}</li>`;
@@ -121,10 +121,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         renderList("cv-experience", cv.work_experience, (job) => `
             <li class="item">
-                <h4>${escapeHtml(job.job_title)} в ${escapeHtml(job.company)}</h4>
+                <h4>${escapeHtml(job.job_title)} at ${escapeHtml(job.company)}</h4>
                 <div class="meta">
                     <time datetime="${escapeHtml(job.from_date)}">${escapeHtml(job.from_date)}</time> — 
-                    ${job.to_date ? `<time datetime="${escapeHtml(job.to_date)}">${escapeHtml(job.to_date)}</time>` : "Нині"} | ${escapeHtml(job.location || "Віддалено")}
+                    ${job.to_date ? `<time datetime="${escapeHtml(job.to_date)}">${escapeHtml(job.to_date)}</time>` : "Present"} | ${escapeHtml(job.location || "Remote")}
                 </div>
                 ${job.description ? `<p>${escapeHtml(job.description)}</p>` : ""}
             </li>
@@ -142,21 +142,21 @@ document.addEventListener("DOMContentLoaded", () => {
                         ${i.description ? `<p>${escapeHtml(i.description)}</p>` : ""}
                     </li>
                 `).join("");
-                parts.push(`<li class="item"><h4>Інтереси:</h4><ul class="sub-list">${interestsHtml}</ul></li>`);
+                parts.push(`<li class="item"><h4>Interests:</h4><ul class="sub-list">${interestsHtml}</ul></li>`);
             }
             if (cv.publications?.length) {
                 const pubsHtml = cv.publications.map(p => `
                     <li>
                         <strong>${escapeHtml(p.title)}</strong>
                         <div class="meta">
-                            <time datetime="${escapeHtml(p.publication_date || "")}">${escapeHtml(p.publication_date || "Дата не вказана")}</time>
+                            <time datetime="${escapeHtml(p.publication_date || "")}">${escapeHtml(p.publication_date || "Date not specified")}</time>
                             ${p.journal ? `— <em>${escapeHtml(p.journal)}</em>` : ""}
                         </div>
                     </li>
                 `).join("");
-                parts.push(`<li class="item"><h4>Публікації:</h4><ul class="sub-list">${pubsHtml}</ul></li>`);
+                parts.push(`<li class="item"><h4>Publications:</h4><ul class="sub-list">${pubsHtml}</ul></li>`);
             }
-            scienceContainer.innerHTML = parts.join("") || '<li class="fadedText">Немає даних</li>';
+            scienceContainer.innerHTML = parts.join("") || '<li class="fadedText">No data available</li>';
         }
         renderList("cv-awards", cv.awards, (award) => `
             <li class="item">

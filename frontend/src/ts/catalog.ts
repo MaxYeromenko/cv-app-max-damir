@@ -17,16 +17,16 @@ const DUMMY_MEMBERS: UserCV[] = [
         id: "fallback-1",
         photo: null,
         personal_info: {
-            first_name: "Максим",
-            last_name: "Петренко",
+            first_name: "Maksym",
+            last_name: "Petrenko",
             email: "m.petrenko@example.com",
             phone: "+380501234567",
             date_of_birth: "2003-05-14",
-            nationality: "Україна",
-            country_of_residence: "Україна",
+            nationality: "Ukraine",
+            country_of_residence: "Ukraine",
             gender: "male",
         },
-        languages: [{ name: "Англійська", proficiency: "upper_intermediate" }],
+        languages: [{ name: "English", proficiency: "upper_intermediate" }],
         programming_skills: [
             { language: "TypeScript", level: "advanced" },
             { language: "JavaScript", level: "advanced" },
@@ -41,22 +41,22 @@ const DUMMY_MEMBERS: UserCV[] = [
         scientific_interests: [],
         publications: [],
         awards: [],
-        hobbies: [{ name: "Стрімінг" }],
+        hobbies: [{ name: "Streaming" }],
     },
     {
         id: "fallback-2",
         photo: null,
         personal_info: {
-            first_name: "Дамір",
-            last_name: "Іванов",
+            first_name: "Damir",
+            last_name: "Ivanov",
             email: "d.ivanov@example.com",
             phone: "+380671234567",
             date_of_birth: "2003-11-20",
-            nationality: "Україна",
-            country_of_residence: "Україна",
+            nationality: "Ukraine",
+            country_of_residence: "Ukraine",
             gender: "male",
         },
-        languages: [{ name: "Англійська", proficiency: "advanced" }],
+        languages: [{ name: "English", proficiency: "advanced" }],
         programming_skills: [
             { language: "Python", level: "expert" },
             { language: "C++", level: "advanced" },
@@ -102,7 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data: ApiResponse = await response.json();
             return { items: data.items || [], error: false };
         } catch (error) {
-            console.error("Помилка завантаження даних із сервера:", error);
+            console.error("Error loading data from server:", error);
             return { items: [], error: true };
         }
     }
@@ -111,18 +111,18 @@ document.addEventListener("DOMContentLoaded", () => {
         const row = document.createElement("div");
         row.className = "catalog-row";
 
-        const location = escapeHtml(cv.personal_info?.country_of_residence || cv.personal_info?.nationality || "Україна");
+        const location = escapeHtml(cv.personal_info?.country_of_residence || cv.personal_info?.nationality || "Ukraine");
         const email = escapeHtml(cv.personal_info?.email || "—");
         const phone = escapeHtml(cv.personal_info?.phone || "—");
-        const hours = cv.device_access?.weekly_hours ? `${cv.device_access.weekly_hours} год/тиждень` : "Гнучкий графік";
-        const fullName = escapeHtml(`${cv.personal_info?.first_name || ""} ${cv.personal_info?.last_name || ""}`.trim() || "Без імені");
-        const role = escapeHtml(cv.work_experience?.[0]?.job_title || "IT Спеціаліст");
+        const hours = cv.device_access?.weekly_hours ? `${cv.device_access.weekly_hours} h/week` : "Flexible schedule";
+        const fullName = escapeHtml(`${cv.personal_info?.first_name || ""} ${cv.personal_info?.last_name || ""}`.trim() || "Unnamed");
+        const role = escapeHtml(cv.work_experience?.[0]?.job_title || "IT Specialist");
         const photoSrc = cv.photo ? encodeURI(cv.photo) : FALLBACK_PHOTO;
 
         const langs = (cv.languages || []).map((l) => {
             const formattedLevel = PROFICIENCY_LABELS[l.proficiency as ProficiencyLevel] || l.proficiency;
             return `${escapeHtml(l.name)} — ${escapeHtml(formattedLevel)}`;
-        }).join(", ") || "Українська";
+        }).join(", ") || "English";
 
         const badgesHtml = (cv.programming_skills || []).slice(0, 3).map((s) => {
             const levelLabel = PROGRAMMING_LEVEL_LABELS[s.level as ProgrammingLevel] || s.level;
@@ -131,11 +131,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         row.innerHTML = `
             <div class="row-meta">
-                <p><strong>Локація:</strong> ${location}</p>
+                <p><strong>Location:</strong> ${location}</p>
                 <p><strong>Email:</strong> ${email}</p>
-                <p><strong>Телефон:</strong> ${phone}</p>
-                <p><strong>Доступність:</strong> ${hours}</p>
-                <p><strong>Мови:</strong> ${langs}</p>
+                <p><strong>Phone:</strong> ${phone}</p>
+                <p><strong>Availability:</strong> ${hours}</p>
+                <p><strong>Languages:</strong> ${langs}</p>
             </div>
             <article class="row-main">
                 <div class="card-avatar">
@@ -145,10 +145,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     <h3>${fullName}</h3>
                     <p class="fadedText">${role}</p>
                     <div class="card-badges">
-                        ${badgesHtml || '<span class="badge">Стек не вказано</span>'}
+                        ${badgesHtml || '<span class="badge">No skills listed</span>'}
                     </div>
                 </div>
-                <a href="/member.html?id=${encodeURIComponent(cv.id)}" class="cta-button" rel="noopener noreferrer">Переглянути профіль</a>
+                <a href="/member.html?id=${encodeURIComponent(cv.id)}" class="cta-button" rel="noopener noreferrer">View profile</a>
             </article>
         `;
         return row;
@@ -162,14 +162,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isDbError) {
             const errorBanner = document.createElement("div");
             errorBanner.className = "db-error-banner";
-            errorBanner.innerHTML = "<strong>Увага!</strong> Немає зв'язку з базою даних. Показано демонстраційні картки (заглушки).";
+            errorBanner.innerHTML = "<strong>Warning!</strong> No connection to the database. Demo cards are shown instead.";
             catalogContent.insertBefore(errorBanner, paginationNav);
         }
 
         if (filteredMembers.length === 0) {
             const emptyState = document.createElement("div");
             emptyState.className = "empty-state";
-            emptyState.innerHTML = `<p class="fadedText">За вашим запитом жодного резюме не знайдено.</p>`;
+            emptyState.innerHTML = `<p class="fadedText">No resumes match your search.</p>`;
             catalogContent.insertBefore(emptyState, paginationNav);
             updatePaginationUI(0);
             return;
@@ -235,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function init(): Promise<void> {
         hoursInput?.addEventListener("input", () => {
-            if (hoursValueSpan && hoursInput) hoursValueSpan.textContent = `${hoursInput.value} год`;
+            if (hoursValueSpan && hoursInput) hoursValueSpan.textContent = `${hoursInput.value} h`;
         });
 
         filtersForm?.addEventListener("submit", (e) => {
@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         filtersForm?.addEventListener("reset", () => {
             setTimeout(() => {
-                if (hoursValueSpan) hoursValueSpan.textContent = "0 год";
+                if (hoursValueSpan) hoursValueSpan.textContent = "0 h";
                 filteredMembers = [...allMembers];
                 currentPage = 1;
                 renderCatalog();

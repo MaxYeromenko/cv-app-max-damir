@@ -58,13 +58,13 @@ document.addEventListener("DOMContentLoaded", () => {
     async function checkBackendHealth(): Promise<void> {
         try {
             const response = await fetch(`${API_URL}?skip=0&limit=1`);
-            if (!response.ok) throw new Error("Помилка зв'язку з бекендом");
+            if (!response.ok) throw new Error("Backend connection failed");
         } catch (error) {
-            console.error("Бекенд недоступний:", error);
+            console.error("Backend unavailable:", error);
 
             const errorBanner = document.createElement("div");
             errorBanner.className = "db-error-banner";
-            errorBanner.innerHTML = "<strong>Увага!</strong> Немає зв'язку з базою даних. Збереження резюме тимчасово недоступне.";
+            errorBanner.innerHTML = "<strong>Warning!</strong> No connection to the database. Saving resumes is temporarily unavailable.";
             form?.parentNode?.insertBefore(errorBanner, form);
 
             Array.from(form?.elements || []).forEach((el) => {
@@ -103,45 +103,45 @@ document.addEventListener("DOMContentLoaded", () => {
         const birthDate = val("birth-date");
 
         if (!firstName || firstName.length > 20) {
-            errors.push("Ім'я обов'язкове (від 1 до 20 символів).");
+            errors.push("First name is required (1 to 20 characters).");
         }
         if (!lastName || lastName.length > 20) {
-            errors.push("Прізвище обов'язкове (від 1 до 20 символів).");
+            errors.push("Last name is required (1 to 20 characters).");
         }
         if (preferredName && preferredName.length > 20) {
-            errors.push("Бажане ім'я не може перевищувати 20 символів.");
+            errors.push("Preferred name cannot exceed 20 characters.");
         }
         if (!nationality || nationality.length > 20) {
-            errors.push("Вкажіть національність (від 1 до 20 символів).");
+            errors.push("Enter a nationality (1 to 20 characters).");
         }
         if (!country || country.length > 30) {
-            errors.push("Вкажіть країну проживання (від 1 до 30 символів).");
+            errors.push("Enter a country of residence (1 to 30 characters).");
         }
 
         if (!birthDate) {
-            errors.push("Оберіть дату народження.");
+            errors.push("Select a date of birth.");
         } else if (!isValidDateStr(birthDate) || isFutureDate(birthDate)) {
-            errors.push("Дата народження некоректна або вказана в майбутньому.");
+            errors.push("Date of birth is invalid or in the future.");
         } else {
             const birthYear = new Date(birthDate).getFullYear();
             const currentYear = new Date().getFullYear();
             if (currentYear - birthYear < 14) {
-                errors.push("Вік повинен бути не менше 14 років.");
+                errors.push("Age must be at least 14 years.");
             }
         }
 
         const emailVal = emailInput?.value.trim() || "";
         if (!EMAIL_REGEX.test(emailVal) || !VALID_TLDS.test(emailVal)) {
-            if (emailError) emailError.textContent = "Невірний формат email або домен.";
-            errors.push("Некоректний email.");
+            if (emailError) emailError.textContent = "Invalid email format or domain.";
+            errors.push("Invalid email address.");
         } else if (emailError) {
             emailError.textContent = "";
         }
 
         const phoneVal = phoneInput?.value.trim() || "";
         if (!PHONE_REGEX.test(phoneVal) || phoneVal.length < 10 || phoneVal.length > 15) {
-            if (phoneError) phoneError.textContent = "Формат: від 10 до 15 символів (+380XXXXXXXXX).";
-            errors.push("Некоректний номер телефону.");
+            if (phoneError) phoneError.textContent = "Format: 10 to 15 characters (+380XXXXXXXXX).";
+            errors.push("Invalid phone number.");
         } else if (phoneError) {
             phoneError.textContent = "";
         }
@@ -150,62 +150,62 @@ document.addEventListener("DOMContentLoaded", () => {
         if (hoursRaw) {
             const h = parseFloat(hoursRaw);
             if (isNaN(h) || h < 0 || h > 168) {
-                errors.push("Години доступності мають бути від 0 до 168 на тиждень.");
+                errors.push("Weekly availability must be between 0 and 168 hours.");
             }
         }
 
         const jobTitle = val("job-title");
         if (jobTitle) {
-            if (jobTitle.length > 50) errors.push("Посада має бути до 50 символів.");
+            if (jobTitle.length > 50) errors.push("Job title cannot exceed 50 characters.");
             const jobCompany = val("job-company");
-            if (!jobCompany || jobCompany.length > 50) errors.push("Вкажіть компанію (до 50 символів).");
+            if (!jobCompany || jobCompany.length > 50) errors.push("Enter a company name (up to 50 characters).");
             const jobLoc = val("job-location");
-            if (!jobLoc || jobLoc.length > 50) errors.push("Вкажіть локацію роботи (до 50 символів).");
+            if (!jobLoc || jobLoc.length > 50) errors.push("Enter a work location (up to 50 characters).");
 
             const fromDate = val("job-from");
             const toDate = val("job-to");
 
             if (!fromDate || !isValidDateStr(fromDate)) {
-                errors.push("Вкажіть коректну дату початку роботи.");
+                errors.push("Enter a valid work start date.");
             }
             if (toDate && (!isValidDateStr(toDate) || new Date(toDate) < new Date(fromDate))) {
-                errors.push("Дата завершення роботи не може бути ранішою за дату початку.");
+                errors.push("The end date cannot be earlier than the start date.");
             }
 
             const jobDesc = val("job-desc");
             if (jobDesc && (jobDesc.length < 10 || jobDesc.length > 300)) {
-                errors.push("Опис роботи повинен містити від 10 до 300 символів (або залиште порожнім).");
+                errors.push("Work description must be 10 to 300 characters (or left blank).");
             }
         }
 
         const sciName = val("sci-name");
         if (sciName) {
-            if (sciName.length > 100) errors.push("Назва інтересу: максимум 100 символів.");
+            if (sciName.length > 100) errors.push("Interest name: up to 100 characters.");
             const sciDesc = val("sci-desc");
             if (sciDesc && (sciDesc.length < 10 || sciDesc.length > 300)) {
-                errors.push("Опис інтересу повинен містити від 10 до 300 символів.");
+                errors.push("Interest description must be 10 to 300 characters.");
             }
         }
 
         const pubTitle = val("pub-title");
         if (pubTitle) {
-            if (pubTitle.length > 200) errors.push("Назва публікації: максимум 200 символів.");
+            if (pubTitle.length > 200) errors.push("Publication title: up to 200 characters.");
             const pubJournal = val("pub-journal");
-            if (pubJournal && pubJournal.length > 100) errors.push("Журнал публікації: максимум 100 символів.");
+            if (pubJournal && pubJournal.length > 100) errors.push("Publication journal: up to 100 characters.");
             const pubDate = val("pub-date");
             if (pubDate && (!isValidDateStr(pubDate) || isFutureDate(pubDate))) {
-                errors.push("Дата публікації не може бути в майбутньому.");
+                errors.push("Publication date cannot be in the future.");
             }
         }
 
         const awardTitle = val("award-title");
         if (awardTitle) {
-            if (awardTitle.length > 100) errors.push("Назва нагороди: максимум 100 символів.");
+            if (awardTitle.length > 100) errors.push("Award title: up to 100 characters.");
             const awardOrg = val("award-org");
-            if (awardOrg && awardOrg.length > 100) errors.push("Організація нагороди: максимум 100 символів.");
+            if (awardOrg && awardOrg.length > 100) errors.push("Award organization: up to 100 characters.");
             const awardDate = val("award-date");
             if (awardDate && (!isValidDateStr(awardDate) || isFutureDate(awardDate))) {
-                errors.push("Дата нагороди не може бути в майбутньому.");
+                errors.push("Award date cannot be in the future.");
             }
         }
 
@@ -226,11 +226,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function uploadPhoto(file: File): Promise<string | null> {
         if (!file.type.startsWith("image/")) {
-            alert("Вибраний файл не є зображенням.");
+            alert("The selected file is not an image.");
             return null;
         }
         if (file.size > 5 * 1024 * 1024) {
-            alert("Розмір фото не повинен перевищувати 5 МБ.");
+            alert("Photo size must not exceed 5 MB.");
             return null;
         }
 
@@ -245,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await response.json();
             return data.secure_url || null;
         } catch (error) {
-            console.error("Помилка завантаження фото в Cloudinary:", error);
+            console.error("Error uploading photo to Cloudinary:", error);
             return null;
         }
     }
@@ -265,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const workExperience = hasJob ? [{
             job_title: val("job-title").slice(0, 50),
             company: (val("job-company") || "Unknown").slice(0, 50),
-            location: (val("job-location") || "Віддалено").slice(0, 50),
+            location: (val("job-location") || "Remote").slice(0, 50),
             from_date: val("job-from") || val("birth-date"),
             to_date: val("job-to") ? val("job-to") : null,
             description: cleanDescription(val("job-desc")),
@@ -340,12 +340,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!response.ok) {
                 const errData = await response.json();
-                console.error("FastAPI помилка валідації (422):", errData);
+                console.error("FastAPI validation error (422):", errData);
                 return false;
             }
             return true;
         } catch (err) {
-            console.error("Мережева помилка відправки:", err);
+            console.error("Network error while submitting:", err);
             return false;
         }
     }
@@ -356,7 +356,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!validateForm() || !submitBtn || !form) return;
 
         submitBtn.disabled = true;
-        submitBtn.textContent = "Збереження...";
+        submitBtn.textContent = "Saving...";
 
         let photoUrl: string | null = null;
         const photoFileInput = document.getElementById("photo-file") as HTMLInputElement | null;
@@ -370,14 +370,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (isSuccess) {
             isFormDirty = false;
-            alert("Резюме успішно збережено!");
+            alert("Resume saved successfully!");
             form.reset();
         } else {
-            alert("Не вдалося зберегти резюме. Деталі помилки перевірте в консолі браузера.");
+            alert("Could not save the resume. Check the browser console for error details.");
         }
 
         submitBtn.disabled = false;
-        submitBtn.textContent = "Зберегти резюме";
+        submitBtn.textContent = "Save resume";
     }
 
     form.addEventListener("submit", handleFormSubmit);

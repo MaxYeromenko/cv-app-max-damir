@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const exportBtn = document.getElementById("export-pdf-btn") as HTMLButtonElement | null;
 
     if (!cvId) {
-        showError("ID резюме не вказано в URL.");
+        showError("CV ID is not specified in the URL.");
         return;
     }
 
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function loadMemberData(): Promise<void> {
         try {
             const response = await fetch(`${API_URL}/${cvId}`);
-            if (!response.ok) throw new Error("Резюме не знайдено");
+            if (!response.ok) throw new Error("CV is not found.");
 
             const cvData: UserCV = await response.json();
             populateDOM(cvData);
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loadingState?.classList.add("hidden");
         errorState?.classList.remove("hidden");
         if (errorState && msg) {
-            errorState.innerHTML = `<strong>Помилка:</strong> ${escapeHtml(msg)}`;
+            errorState.innerHTML = `<strong>Error:</strong> ${escapeHtml(msg)}`;
         }
     }
 
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
         containerId: string,
         items: T[] | undefined,
         renderFn: (item: T) => string,
-        emptyMsg = "Немає даних"
+        emptyMsg = "No data available"
     ): void {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
         containerId: string,
         items: T[] | undefined,
         formatFn: (item: T) => string,
-        emptyMsg = "Немає даних"
+        emptyMsg = "No data available"
     ): void {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -104,7 +104,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         photo.addEventListener("click", () => {
             modalImg.src = photo.src;
-            modalImg.alt = photo.alt || "Фото учасника";
+            modalImg.alt = photo.alt || "Member's photo";
             modal.showModal();
             window.addEventListener("scroll", closeModal, { passive: true, once: true });
             window.addEventListener("wheel", closeModal, { passive: true, once: true });
@@ -125,8 +125,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         setElementText("cv-name", `${pInfo.first_name} ${pInfo.last_name}`);
-        setElementText("cv-preferred-name", pInfo.preferred_name ? `(Також відомий як: ${pInfo.preferred_name})` : "");
-        setElementText("cv-role", cv.work_experience?.[0]?.job_title || "Кандидат / Студент");
+        setElementText("cv-preferred-name", pInfo.preferred_name ? `(Also known as: ${pInfo.preferred_name})` : "");
+        setElementText("cv-role", cv.work_experience?.[0]?.job_title || "Candidate / Student");
 
         const emailEl = document.getElementById("cv-email") as HTMLAnchorElement | null;
         if (emailEl) {
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setElementText("cv-gender", GENDER_LABELS[pInfo.gender] || pInfo.gender);
         setElementText(
             "cv-hours",
-            cv.device_access?.weekly_hours ? `${cv.device_access.weekly_hours} год/тижд` : "Гнучкий графік"
+            cv.device_access?.weekly_hours ? `${cv.device_access.weekly_hours} h/week` : "Flexible schedule"
         );
 
         renderList("cv-languages", cv.languages, (lang) => {
@@ -167,10 +167,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         renderList("cv-experience", cv.work_experience, (job) => `
             <li class="item">
-                <h4>${escapeHtml(job.job_title)} в ${escapeHtml(job.company)}</h4>
+                <h4>${escapeHtml(job.job_title)} at ${escapeHtml(job.company)}</h4>
                 <div class="meta">
                     <time datetime="${escapeHtml(job.from_date)}">${escapeHtml(job.from_date)}</time> — 
-                    ${job.to_date ? `<time datetime="${escapeHtml(job.to_date)}">${escapeHtml(job.to_date)}</time>` : "Нині"} | ${escapeHtml(job.location || "Віддалено")}
+                    ${job.to_date ? `<time datetime="${escapeHtml(job.to_date)}">${escapeHtml(job.to_date)}</time>` : "Present"} | ${escapeHtml(job.location || "Remote")}
                 </div>
                 ${job.description ? `<p>${escapeHtml(job.description)}</p>` : ""}
             </li>
@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         ${i.description ? `<p>${escapeHtml(i.description)}</p>` : ""}
                     </li>
                 `).join("");
-                parts.push(`<li class="item"><h4>Інтереси:</h4><ul class="sub-list">${interestsHtml}</ul></li>`);
+                parts.push(`<li class="item"><h4>Interests:</h4><ul class="sub-list">${interestsHtml}</ul></li>`);
             }
 
             if (cv.publications?.length) {
@@ -199,15 +199,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     <li>
                         <strong>${escapeHtml(p.title)}</strong>
                         <div class="meta">
-                            <time datetime="${escapeHtml(p.publication_date || "")}">${escapeHtml(p.publication_date || "Дата не вказана")}</time>
+                            <time datetime="${escapeHtml(p.publication_date || "")}">${escapeHtml(p.publication_date || "Date not specified")}</time>
                             ${p.journal ? `— <em>${escapeHtml(p.journal)}</em>` : ""}
                         </div>
                     </li>
                 `).join("");
-                parts.push(`<li class="item"><h4>Публікації:</h4><ul class="sub-list">${pubsHtml}</ul></li>`);
+                parts.push(`<li class="item"><h4>Publications:</h4><ul class="sub-list">${pubsHtml}</ul></li>`);
             }
 
-            scienceContainer.innerHTML = parts.join("") || '<li class="fadedText">Немає даних</li>';
+            scienceContainer.innerHTML = parts.join("") || '<li class="fadedText">No data available</li>';
         }
 
         renderList("cv-awards", cv.awards, (award) => `

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="uk">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
@@ -15,7 +15,7 @@
 <body>
     <header>
         <div class="logo-container">
-            <svg class="logo" class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="50" cy="50" r="46" fill="black" stroke="var(--quaternary-color)" stroke-width="2" />
 
                 <path d="M32 24 H58 L68 34 V76 H32 Z" fill="white" />
@@ -28,7 +28,7 @@
                 <rect x="38" y="70" width="24" height="3" rx="1.5" fill="black" />
             </svg>
             <a href="/" rel="noopener noreferrer">Team CV Network</a>
-            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Змінити тему">
+            <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme">
                 <svg id="theme-icon" viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2"
                     fill="none"></svg>
             </button>
@@ -36,129 +36,129 @@
 
         <nav id="main-nav">
             <ul>
-                <li><a class="scaling" href="/" rel="noopener noreferrer">Головна</a></li>
-                <li><a class="scaling" href="/catalog.html" rel="noopener noreferrer">Каталог</a></li>
-                <li><a class="scaling" href="/add-member.html" rel="noopener noreferrer">Додати резюме</a></li>
+                <li><a class="scaling" href="/" rel="noopener noreferrer">Main page</a></li>
+                <li><a class="scaling" href="/catalog.html" rel="noopener noreferrer">Catalog</a></li>
+                <li><a class="scaling" href="/add-member.html" rel="noopener noreferrer">Add CV</a></li>
             </ul>
         </nav>
     </header>
 
     <noscript>
         <div style="background-color: #d32f2f; color: white; text-align: center; padding: 10px; font-weight: bold;">
-            Увага! JavaScript вимкнено у вашому браузері. Деякі інтерактивні функції сайту можуть працювати обмежено.
+            Warning! JavaScript is disabled in your browser. Some interactive features of the site may work limited.
         </div>
     </noscript>
 
     <main class="member-main">
-        <nav class="action-bar" aria-label="Дії з резюме">
-            <a href="/catalog.html" class="cta-button return-btn">&larr; Повернутися до каталогу</a>
+        <nav class="action-bar" aria-label="Resume actions">
+            <a href="/catalog.html" class="cta-button return-btn">&larr; Return to catalog</a>
             <button id="export-pdf-btn" class="cta-button pdf-btn" disabled>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
                 </svg>
-                Експорт у PDF
+                Export to PDF
             </button>
         </nav>
 
         <section class="status-container">
             <div id="error-state" class="db-error-banner hidden"
                 style="background-color: rgba(211,47,47,0.1); color: #d32f2f;">
-                <strong>Помилка:</strong> Резюме не знайдено або бекенд недоступний.
+                <strong>Error:</strong> Resume not found or backend is unavailable.
             </div>
             <div id="loading-state" class="empty-state">
-                Завантаження даних профілю...
+                Loading profile data...
             </div>
         </section>
 
-        <section id="cv-document" class="cv-document hidden" aria-label="Резюме учасника">
+        <section id="cv-document" class="cv-document hidden" aria-label="Resume of the member">
             <header class="cv-header">
                 <div class="cv-photo-container">
-                    <img id="cv-photo" src="./public/cv.svg" alt="Фото учасника" />
+                    <img id="cv-photo" src="./public/cv.svg" alt="Photo of the member" />
                 </div>
                 <div class="cv-title-area">
-                    <h1 id="cv-name">Ім'я Прізвище</h1>
+                    <h1 id="cv-name">First Name Last Name</h1>
                     <p id="cv-preferred-name" class="fadedText"></p>
-                    <h2 id="cv-role">Роль у команді (Завантаження...)</h2>
+                    <h2 id="cv-role">Role in the team (Loading...)</h2>
                 </div>
             </header>
 
             <div class="cv-body">
                 <aside class="cv-sidebar">
                     <div class="cv-section">
-                        <h3>Особиста інформація</h3>
+                        <h3>Personal Information</h3>
                         <ul class="cv-list">
                             <li><strong>Email:</strong> <a id="cv-email" href="mailto:">—</a></li>
-                            <li><strong>Телефон:</strong> <a id="cv-phone" href="tel:">—</a></li>
-                            <li><strong>Дата народження:</strong> <time id="cv-dob">—</time></li>
-                            <li><strong>Локація:</strong> <span id="cv-location">—</span></li>
-                            <li><strong>Стать:</strong> <span id="cv-gender">—</span></li>
-                            <li><strong>Доступність:</strong> <span id="cv-hours">—</span></li>
+                            <li><strong>Phone:</strong> <a id="cv-phone" href="tel:">—</a></li>
+                            <li><strong>Birth Date:</strong> <time id="cv-dob">—</time></li>
+                            <li><strong>Location:</strong> <span id="cv-location">—</span></li>
+                            <li><strong>Gender:</strong> <span id="cv-gender">—</span></li>
+                            <li><strong>Availability:</strong> <span id="cv-hours">—</span></li>
                         </ul>
                     </div>
 
                     <div class="cv-section">
-                        <h3>Мови</h3>
+                        <h3>Languages</h3>
                         <ul id="cv-languages" class="cv-list">
-                            <li class="fadedText">Немає даних</li>
+                            <li class="fadedText">No data available</li>
                         </ul>
                     </div>
 
                     <div class="cv-section">
-                        <h3>Хобі</h3>
-                        <p id="cv-hobbies" class="cv-text fadedText">Немає даних</p>
+                        <h3>Hobbies</h3>
+                        <p id="cv-hobbies" class="cv-text fadedText">No data available</p>
                     </div>
                 </aside>
 
                 <div class="cv-main-content">
                     <div class="cv-section">
-                        <h3>Професійні навички (Стек)</h3>
-                        <p id="cv-programming-skills" class="cv-text fadedText">Немає даних</p>
+                        <h3>Professional Skills (Stack)</h3>
+                        <p id="cv-programming-skills" class="cv-text fadedText">No data available</p>
                     </div>
 
                     <div class="cv-section">
-                        <h3>Досвід роботи</h3>
+                        <h3>Work Experience</h3>
                         <ul id="cv-experience" class="timeline">
-                            <li class="fadedText">Немає даних</li>
+                            <li class="fadedText">No data available</li>
                         </ul>
                     </div>
 
                     <div class="cv-section">
-                        <h3>Освіта та Улюблені предмети</h3>
-                        <p id="cv-subjects" class="cv-text fadedText">Немає даних</p>
+                        <h3>Education & Favorite Subjects</h3>
+                        <p id="cv-subjects" class="cv-text fadedText">No data available</p>
                     </div>
 
                     <div class="cv-section">
-                        <h3>Наукові інтереси та Публікації</h3>
+                        <h3>Scientific Interests & Publications</h3>
                         <ul id="cv-science" class="content-list">
-                            <li class="fadedText">Немає даних</li>
+                            <li class="fadedText">No data available</li>
                         </ul>
                     </div>
 
                     <div class="cv-section">
-                        <h3>Нагороди та Досягнення</h3>
+                        <h3>Awards & Achievements</h3>
                         <ul id="cv-awards" class="content-list">
-                            <li class="fadedText">Немає даних</li>
+                            <li class="fadedText">No data available</li>
                         </ul>
                     </div>
                 </div>
             </div>
 
-            <div class="cv-watermark">Створено на Team CV Network</div>
+            <div class="cv-watermark">Created with Team CV Network</div>
         </section>
     </main>
 
     <footer id="footer">
-        <p>&copy; <time id="current-year" datetime="2026">2026</time> Team CV Network by WebDUO. Всі права захищено.</p>
+        <p>&copy; <time id="current-year" datetime="2026">2026</time> Team CV Network by WebDUO. All rights reserved.</p>
         <address>
-            Розробка: Максим &amp; Дамір |
+            Development: Maksym &amp; Damir |
             <a class="scaling" href="https://github.com/MaxYeromenko/cv-app-max-damir" target="_blank"
                 rel="noopener noreferrer">GitHub
-                репозиторій</a>
+                repo</a>
         </address>
     </footer>
 
-    <dialog id="photo-modal" class="photo-modal" aria-label="Збільшене фото учасника">
-        <img id="modal-photo-img" src="" alt="Збільшене фото" />
+    <dialog id="photo-modal" class="photo-modal" aria-label="Enlarged photo of member">
+        <img id="modal-photo-img" src="" alt="Enlarged photo" />
     </dialog>
 
     <script type="module" src="./src/js/index.js"></script>
