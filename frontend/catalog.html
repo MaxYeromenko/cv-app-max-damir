@@ -36,7 +36,7 @@
 
         <nav id="main-nav">
             <ul>
-                <li><a class="scaling" href="/" rel="noopener noreferrer">Main page</a></li>
+                <li><a class="scaling" href="/" rel="noopener noreferrer">Home</a></li>
                 <!-- <li><a class="scaling" href="/catalog.html" rel="noopener noreferrer">Catalog</a></li> -->
                 <li><a class="scaling" href="/add-member.html" rel="noopener noreferrer">Add CV</a></li>
             </ul>
@@ -57,11 +57,8 @@
             </div>
 
             <div class="catalog-content" aria-label="List of Resumes">
+                <p id="total-count" class="fadedText">Loading resumes...</p>
                 <div class="catalog-row">
-                    <div class="row-meta">
-                        <span id="total-count" class="fadedText">Loading resumes...</span>
-                    </div>
-
                     <article class="row-main">
                         <div class="card-avatar">
                             <img src="./public/cv.svg" alt="Member Avatar" />
@@ -126,7 +123,7 @@
                     <label for="filter-subject">Favorite School Subject:</label>
                     <select id="filter-subject" name="favoriteSubject">
                         <option value="">All Subjects</option>
-                        <option value="computer_science" selected>Computer Science</option>
+                        <option value="computer_science">Computer Science</option>
                         <option value="mathematics">Mathematics</option>
                         <option value="physics">Physics</option>
                         <option value="chemistry">Chemistry</option>
@@ -155,7 +152,8 @@
     </main>
 
     <footer id="footer">
-        <p>&copy; <time id="current-year" datetime="2026">2026</time> Team CV Network by WebDUO. All rights reserved.</p>
+        <p>&copy; <time id="current-year" datetime="2026">2026</time> Team CV Network by WebDUO. All rights reserved.
+        </p>
         <address>
             Development: Maksym &amp; Damir |
             <a class="scaling" href="https://github.com/MaxYeromenko/cv-app-max-damir" target="_blank"

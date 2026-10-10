@@ -1,68 +1,6 @@
 import { API_URL, FALLBACK_PHOTO, PROFICIENCY_LABELS, PROGRAMMING_LEVEL_LABELS, } from "./_types.js";
-import { escapeHtml } from "./_utils.js";
+import { escapeHtml, getAdminApiHeaders } from "./_utils.js";
 const ITEMS_PER_PAGE = 5;
-const DUMMY_MEMBERS = [
-    {
-        id: "fallback-1",
-        photo: null,
-        personal_info: {
-            first_name: "Maksym",
-            last_name: "Petrenko",
-            email: "m.petrenko@example.com",
-            phone: "+380501234567",
-            date_of_birth: "2003-05-14",
-            nationality: "Ukraine",
-            country_of_residence: "Ukraine",
-            gender: "male",
-        },
-        languages: [{ name: "English", proficiency: "upper_intermediate" }],
-        programming_skills: [
-            { language: "TypeScript", level: "advanced" },
-            { language: "JavaScript", level: "advanced" },
-        ],
-        work_experience: [{
-                job_title: "Frontend Developer",
-                company: "Tech Solutions",
-                from_date: "2023-01-10",
-            }],
-        favorite_subjects_in_school: ["computer_science", "mathematics"],
-        device_access: { weekly_hours: 40 },
-        scientific_interests: [],
-        publications: [],
-        awards: [],
-        hobbies: [{ name: "Streaming" }],
-    },
-    {
-        id: "fallback-2",
-        photo: null,
-        personal_info: {
-            first_name: "Damir",
-            last_name: "Ivanov",
-            email: "d.ivanov@example.com",
-            phone: "+380671234567",
-            date_of_birth: "2003-11-20",
-            nationality: "Ukraine",
-            country_of_residence: "Ukraine",
-            gender: "male",
-        },
-        languages: [{ name: "English", proficiency: "advanced" }],
-        programming_skills: [
-            { language: "Python", level: "expert" },
-            { language: "C++", level: "advanced" },
-        ],
-        work_experience: [{
-                job_title: "Backend Developer",
-                company: "Data Corp",
-                from_date: "2022-05-15",
-            }],
-        favorite_subjects_in_school: ["physics", "computer_science"],
-        device_access: { weekly_hours: 35 },
-        scientific_interests: [],
-        publications: [],
-        awards: [],
-        hobbies: [],
-    },
-];
 document.addEventListener("DOMContentLoaded", () => {
     const catalogContent = document.querySelector(".catalog-content");
     const paginationNav = catalogContent?.querySelector(".pagination");
@@ -80,17 +18,21 @@ document.addEventListener("DOMContentLoaded", () => {
     let filteredMembers = [];
     let currentPage = 1;
     let isDbError = false;
+    let dbErrorMessage = "";
     async function fetchMembersData() {
         try {
             const response = await fetch(`${API_URL}?skip=0&limit=100`);
             if (!response.ok)
                 throw new Error(`HTTP error: ${response.status}`);
             const data = await response.json();
-            return { items: data.items || [], error: false };
+            return { items: data.items, errorMessage: "" };
         }
         catch (error) {
             console.error("Error loading data from server:", error);
-            return { items: [], error: true };
+            return {
+                items: [],
+                errorMessage: error instanceof Error ? error.message : "Unknown error",
+            };
         }
     }
     function createRowElement(cv) {
@@ -99,14 +41,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const location = escapeHtml(cv.personal_info?.country_of_residence || cv.personal_info?.nationality || "Ukraine");
         const email = escapeHtml(cv.personal_info?.email || "—");
         const phone = escapeHtml(cv.personal_info?.phone || "—");
-        const hours = cv.device_access?.weekly_hours ? `${cv.device_access.weekly_hours} h/week` : "Flexible schedule";
+        const hours = cv.device_access?.weekly_hours != null ? `${cv.device_access.weekly_hours} h/week` : "Not specified";
         const fullName = escapeHtml(`${cv.personal_info?.first_name || ""} ${cv.personal_info?.last_name || ""}`.trim() || "Unnamed");
-        const role = escapeHtml(cv.work_experience?.[0]?.job_title || "IT Specialist");
+        const role = escapeHtml(cv.work_experience?.[0]?.job_title || "Role not specified");
         const photoSrc = cv.photo ? encodeURI(cv.photo) : FALLBACK_PHOTO;
         const langs = (cv.languages || []).map((l) => {
             const formattedLevel = PROFICIENCY_LABELS[l.proficiency] || l.proficiency;
             return `${escapeHtml(l.name)} — ${escapeHtml(formattedLevel)}`;
-        }).join(", ") || "English";
+        }).join(", ") || "No languages listed";
         const badgesHtml = (cv.programming_skills || []).slice(0, 3).map((s) => {
             const levelLabel = PROGRAMMING_LEVEL_LABELS[s.level] || s.level;
             return `<span class="badge">${escapeHtml(s.language)} · ${escapeHtml(levelLabel)}</span>`;
@@ -130,9 +72,13 @@ document.addEventListener("DOMContentLoaded", () => {
                         ${badgesHtml || '<span class="badge">No skills listed</span>'}
                     </div>
                 </div>
-                <a href="/member.html?id=${encodeURIComponent(cv.id)}" class="cta-button" rel="noopener noreferrer">View profile</a>
-            </article>
-        `;
+                    <a href="/member.html?id=${encodeURIComponent(cv.id)}" class="cta-button" rel="noopener noreferrer">View profile</a>
+                    <button type="button" class="cta-button delete-cv-btn" data-cv-id="${escapeHtml(cv.id)}" aria-label="Delete CV for ${fullName}">Delete</button>
+                </article>
+            `;
+        row.querySelector(".delete-cv-btn")?.addEventListener("click", () => {
+            void deleteMember(cv);
+        });
         return row;
     }
     function renderCatalog() {
@@ -142,24 +88,58 @@ document.addEventListener("DOMContentLoaded", () => {
         if (isDbError) {
             const errorBanner = document.createElement("div");
             errorBanner.className = "db-error-banner";
-            errorBanner.innerHTML = "<strong>Warning!</strong> No connection to the database. Demo cards are shown instead.";
+            errorBanner.textContent = `Unable to load CVs: ${dbErrorMessage}`;
             catalogContent.insertBefore(errorBanner, paginationNav);
         }
         if (filteredMembers.length === 0) {
             const emptyState = document.createElement("div");
             emptyState.className = "empty-state";
-            emptyState.innerHTML = `<p class="fadedText">No resumes match your search.</p>`;
+            let message = "No resumes match your search.";
+            if (isDbError)
+                message = "CVs could not be loaded.";
+            else if (allMembers.length === 0)
+                message = "No CVs have been added yet.";
+            emptyState.textContent = message;
             catalogContent.insertBefore(emptyState, paginationNav);
             updatePaginationUI(0);
+            updateTotalCount();
             return;
         }
         const totalPages = Math.ceil(filteredMembers.length / ITEMS_PER_PAGE);
+        currentPage = Math.min(currentPage, totalPages);
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
         const pageItems = filteredMembers.slice(startIndex, startIndex + ITEMS_PER_PAGE);
         pageItems.forEach((cv) => {
             catalogContent.insertBefore(createRowElement(cv), paginationNav);
         });
         updatePaginationUI(totalPages);
+        updateTotalCount();
+    }
+    function updateTotalCount() {
+        const totalCount = document.getElementById("total-count");
+        if (totalCount)
+            totalCount.textContent = `${filteredMembers.length} CV${filteredMembers.length === 1 ? "" : "s"}`;
+    }
+    async function deleteMember(cv) {
+        const fullName = `${cv.personal_info.first_name} ${cv.personal_info.last_name}`;
+        if (!window.confirm(`Delete the CV for ${fullName}? This action cannot be undone.`))
+            return;
+        try {
+            const response = await fetch(`${API_URL}/${encodeURIComponent(cv.id)}`, {
+                method: "DELETE",
+                headers: getAdminApiHeaders(),
+            });
+            if (!response.ok) {
+                const details = await response.text();
+                throw new Error(`HTTP ${response.status}: ${details || response.statusText}`);
+            }
+            allMembers = allMembers.filter((member) => member.id !== cv.id);
+            applyFilters();
+        }
+        catch (error) {
+            console.error("Error deleting CV:", error);
+            window.alert(`Could not delete the CV. ${error instanceof Error ? error.message : "Please try again."}`);
+        }
     }
     function updatePaginationUI(totalPages) {
         if (!paginationNumbers)
@@ -193,11 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const preferred = (cv.personal_info?.preferred_name || "").toLowerCase();
             const role = (cv.work_experience?.[0]?.job_title || "").toLowerCase();
             const matchesSearch = !query || fullName.includes(query) || preferred.includes(query) || role.includes(query);
-            const matchesLang = !selectedLang || (cv.programming_skills || []).some((s) => s.language.toLowerCase() === selectedLang);
-            const matchesLevel = !selectedLevel || (cv.programming_skills || []).some((s) => s.level.toLowerCase() === selectedLevel);
+            const matchesSkill = !selectedLang && !selectedLevel || (cv.programming_skills || []).some((skill) => (!selectedLang || skill.language.toLowerCase() === selectedLang) &&
+                (!selectedLevel || skill.level.toLowerCase() === selectedLevel));
             const matchesSubject = !selectedSubject || (cv.favorite_subjects_in_school || []).includes(selectedSubject);
             const matchesHours = (cv.device_access?.weekly_hours ?? 0) >= minHours;
-            return matchesSearch && matchesLang && matchesLevel && matchesSubject && matchesHours;
+            return matchesSearch && matchesSkill && matchesSubject && matchesHours;
         });
         currentPage = 1;
         renderCatalog();
@@ -230,8 +210,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 handlePageChange(currentPage + 1);
         });
         const fetchResult = await fetchMembersData();
-        isDbError = fetchResult.error;
-        allMembers = isDbError ? DUMMY_MEMBERS : fetchResult.items;
+        isDbError = Boolean(fetchResult.errorMessage);
+        dbErrorMessage = fetchResult.errorMessage;
+        allMembers = fetchResult.items;
         filteredMembers = [...allMembers];
         renderCatalog();
     }

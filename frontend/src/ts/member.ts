@@ -10,7 +10,7 @@ import {
     ProgrammingLevel,
     SchoolSubject,
 } from "./_types.js";
-import { escapeHtml, setElementText } from "./_utils.js";
+import { escapeHtml, getAdminApiHeaders, setElementText } from "./_utils.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -21,17 +21,41 @@ document.addEventListener("DOMContentLoaded", () => {
     const errorState = document.getElementById("error-state");
     const cvDocument = document.getElementById("cv-document");
     const exportBtn = document.getElementById("export-pdf-btn") as HTMLButtonElement | null;
+    const editBtn = document.getElementById("edit-cv-btn") as HTMLAnchorElement | null;
+    const deleteBtn = document.getElementById("delete-cv-btn") as HTMLButtonElement | null;
 
     if (!cvId) {
         showError("CV ID is not specified in the URL.");
         return;
     }
+    const memberId = cvId;
 
     exportBtn?.addEventListener("click", () => window.print());
 
+    deleteBtn?.addEventListener("click", async () => {
+        if (!window.confirm("Delete this CV? This action cannot be undone.")) return;
+
+        deleteBtn.disabled = true;
+        try {
+            const response = await fetch(`${API_URL}/${encodeURIComponent(memberId)}`, {
+                method: "DELETE",
+                headers: getAdminApiHeaders(),
+            });
+            if (!response.ok) {
+                const details = await response.text();
+                throw new Error(`HTTP ${response.status}: ${details || response.statusText}`);
+            }
+            window.location.assign("/catalog.html");
+        } catch (error) {
+            console.error("Error deleting CV:", error);
+            window.alert(`Could not delete this CV. ${error instanceof Error ? error.message : "Please try again."}`);
+            deleteBtn.disabled = false;
+        }
+    });
+
     async function loadMemberData(): Promise<void> {
         try {
-            const response = await fetch(`${API_URL}/${cvId}`);
+            const response = await fetch(`${API_URL}/${encodeURIComponent(memberId)}`);
             if (!response.ok) throw new Error("CV is not found.");
 
             const cvData: UserCV = await response.json();
@@ -40,6 +64,11 @@ document.addEventListener("DOMContentLoaded", () => {
             statusContainer?.classList.add("hidden");
             cvDocument?.classList.remove("hidden");
             if (exportBtn) exportBtn.disabled = false;
+            if (editBtn) {
+                editBtn.href = `/add-member.html?id=${encodeURIComponent(memberId)}`;
+                editBtn.classList.remove("hidden");
+            }
+            deleteBtn?.classList.remove("hidden");
         } catch (error) {
             console.error(error);
             showError();
@@ -126,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setElementText("cv-name", `${pInfo.first_name} ${pInfo.last_name}`);
         setElementText("cv-preferred-name", pInfo.preferred_name ? `(Also known as: ${pInfo.preferred_name})` : "");
-        setElementText("cv-role", cv.work_experience?.[0]?.job_title || "Candidate / Student");
+        setElementText("cv-role", cv.work_experience?.[0]?.job_title || "Role not specified");
 
         const emailEl = document.getElementById("cv-email") as HTMLAnchorElement | null;
         if (emailEl) {
@@ -150,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setElementText("cv-gender", GENDER_LABELS[pInfo.gender] || pInfo.gender);
         setElementText(
             "cv-hours",
-            cv.device_access?.weekly_hours ? `${cv.device_access.weekly_hours} h/week` : "Flexible schedule"
+            cv.device_access?.weekly_hours != null ? `${cv.device_access.weekly_hours} h/week` : "Not specified"
         );
 
         renderList("cv-languages", cv.languages, (lang) => {

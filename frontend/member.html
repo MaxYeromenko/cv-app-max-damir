@@ -36,7 +36,7 @@
 
         <nav id="main-nav">
             <ul>
-                <li><a class="scaling" href="/" rel="noopener noreferrer">Main page</a></li>
+                <li><a class="scaling" href="/" rel="noopener noreferrer">Home</a></li>
                 <li><a class="scaling" href="/catalog.html" rel="noopener noreferrer">Catalog</a></li>
                 <li><a class="scaling" href="/add-member.html" rel="noopener noreferrer">Add CV</a></li>
             </ul>
@@ -51,13 +51,19 @@
 
     <main class="member-main">
         <nav class="action-bar" aria-label="Resume actions">
-            <a href="/catalog.html" class="cta-button return-btn">&larr; Return to catalog</a>
-            <button id="export-pdf-btn" class="cta-button pdf-btn" disabled>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
-                </svg>
-                Export to PDF
-            </button>
+            <div class="action-bar-row">
+                <a href="/catalog.html" class="cta-button return-btn">&larr; Return to catalog</a>
+                <button id="export-pdf-btn" class="cta-button pdf-btn" disabled>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                    </svg>
+                    Export to PDF
+                </button>
+            </div>
+            <div class="action-bar-row">
+                <a id="edit-cv-btn" href="#" class="cta-button hidden">Edit CV</a>
+                <button id="delete-cv-btn" type="button" class="cta-button hidden">Delete CV</button>
+            </div>
         </nav>
 
         <section class="status-container">
@@ -148,7 +154,8 @@
     </main>
 
     <footer id="footer">
-        <p>&copy; <time id="current-year" datetime="2026">2026</time> Team CV Network by WebDUO. All rights reserved.</p>
+        <p>&copy; <time id="current-year" datetime="2026">2026</time> Team CV Network by WebDUO. All rights reserved.
+        </p>
         <address>
             Development: Maksym &amp; Damir |
             <a class="scaling" href="https://github.com/MaxYeromenko/cv-app-max-damir" target="_blank"

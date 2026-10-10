@@ -12,3 +12,8 @@ export function setElementText(id: string, text: string): void {
     const el = document.getElementById(id);
     if (el) el.textContent = text;
 }
+
+export function getAdminApiHeaders(): Record<string, string> {
+    const key = localStorage.getItem("adminApiKey");
+    return key ? { "X-Admin-Key": key } : {};
+}

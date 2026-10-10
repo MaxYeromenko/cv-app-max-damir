@@ -1,9 +1,8 @@
 import { API_URL, } from "./_types.js";
+import { getAdminApiHeaders } from "./_utils.js";
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dukwtlvte/image/upload";
 const CLOUDINARY_PRESET = "ml_default";
 const CLOUDINARY_FOLDER = "cv-project/user-pictures";
-const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-const VALID_TLDS = /\.(com|org|net|edu|gov|ua|eu|io|dev|co)$/i;
 const PHONE_REGEX = /^\+?[0-9]{10,15}$/;
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("add-member-form");
@@ -11,7 +10,91 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!form || !submitBtn)
         return;
     let isFormDirty = false;
+    const cvId = new URLSearchParams(window.location.search).get("id");
+    let existingPhotoUrl = null;
     const val = (id) => document.getElementById(id)?.value.trim() || "";
+    const setVal = (id, value) => {
+        const field = document.getElementById(id);
+        if (field)
+            field.value = value || "";
+    };
+    const sectionDefinitions = {
+        programmingSkills: { containerId: "programming-skills-list", templateId: "programming-skill-template" },
+        languages: { containerId: "languages-list", templateId: "language-template" },
+        workExperience: { containerId: "work-experience-list", templateId: "work-experience-template" },
+        scientificInterests: { containerId: "scientific-interests-list", templateId: "scientific-interest-template" },
+        publications: { containerId: "publications-list", templateId: "publication-template" },
+        awards: { containerId: "awards-list", templateId: "award-template" },
+        subjects: { containerId: "subjects-list", templateId: "subject-template" },
+    };
+    let repeatItemCount = 0;
+    function getSectionItems(key) {
+        const container = document.getElementById(sectionDefinitions[key].containerId);
+        return container ? Array.from(container.querySelectorAll("[data-repeat-item]")) : [];
+    }
+    function getItemValue(item, field) {
+        return item.querySelector(`[data-field="${field}"]`)?.value.trim() || "";
+    }
+    function setItemValues(item, values) {
+        for (const [field, value] of Object.entries(values)) {
+            const control = item.querySelector(`[data-field="${field}"]`);
+            if (control)
+                control.value = value || "";
+        }
+    }
+    function addSectionItem(key, values = {}) {
+        const definition = sectionDefinitions[key];
+        const container = document.getElementById(definition.containerId);
+        const template = document.getElementById(definition.templateId);
+        const item = template?.content.firstElementChild?.cloneNode(true);
+        if (!container || !item)
+            return;
+        repeatItemCount += 1;
+        item.querySelectorAll("[data-field]").forEach((control) => {
+            const field = control.dataset.field;
+            if (!field)
+                return;
+            control.id = `repeat-${key}-${repeatItemCount}-${field}`;
+            const label = control.closest(".form-group")?.querySelector("label");
+            if (label)
+                label.htmlFor = control.id;
+        });
+        setItemValues(item, values);
+        item.querySelector(".remove-repeat-item")?.addEventListener("click", () => {
+            item.remove();
+            isFormDirty = true;
+            validateForm();
+        });
+        item.addEventListener("input", () => {
+            isFormDirty = true;
+            validateForm();
+        });
+        item.addEventListener("change", () => {
+            isFormDirty = true;
+            validateForm();
+        });
+        container.appendChild(item);
+    }
+    function resetRepeatableSections() {
+        for (const key of Object.keys(sectionDefinitions)) {
+            const container = document.getElementById(sectionDefinitions[key].containerId);
+            if (container)
+                container.replaceChildren();
+            addSectionItem(key);
+        }
+    }
+    for (const key of Object.keys(sectionDefinitions)) {
+        addSectionItem(key);
+    }
+    document.querySelectorAll("[data-add]").forEach((button) => {
+        button.addEventListener("click", () => {
+            const key = button.dataset.add;
+            if (!(key in sectionDefinitions))
+                return;
+            addSectionItem(key);
+            isFormDirty = true;
+        });
+    });
     const emailInput = document.getElementById("email");
     const phoneInput = document.getElementById("phone");
     const emailError = document.getElementById("email-error");
@@ -31,7 +114,11 @@ document.addEventListener("DOMContentLoaded", () => {
         isFormDirty = false;
         if (validationFeedback)
             validationFeedback.style.display = "none";
-        setTimeout(() => validateForm(), 0);
+        setTimeout(() => {
+            resetRepeatableSections();
+            existingPhotoUrl = null;
+            validateForm();
+        }, 0);
     });
     window.addEventListener("beforeunload", (e) => {
         if (isFormDirty) {
@@ -55,7 +142,93 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
     }
-    checkBackendHealth();
+    void checkBackendHealth();
+    function populateForm(cv) {
+        const info = cv.personal_info;
+        setVal("first-name", info.first_name);
+        setVal("last-name", info.last_name);
+        setVal("preferred-name", info.preferred_name);
+        setVal("gender", info.gender);
+        setVal("birth-date", info.date_of_birth);
+        setVal("nationality", info.nationality);
+        setVal("country", info.country_of_residence);
+        setVal("email", info.email);
+        setVal("phone", info.phone);
+        setVal("device-hours", String(cv.device_access.weekly_hours));
+        setVal("hobbies", cv.hobbies.map((hobby) => hobby.name).join(", "));
+        existingPhotoUrl = cv.photo || null;
+        const populateSection = (key, entries) => {
+            const container = document.getElementById(sectionDefinitions[key].containerId);
+            if (container)
+                container.replaceChildren();
+            if (entries.length)
+                entries.forEach((entry) => addSectionItem(key, entry));
+            else
+                addSectionItem(key);
+        };
+        populateSection("programmingSkills", cv.programming_skills.map((skill) => ({
+            language: skill.language,
+            level: skill.level,
+        })));
+        populateSection("languages", cv.languages.map((language) => ({
+            name: language.name,
+            proficiency: language.proficiency,
+        })));
+        populateSection("workExperience", cv.work_experience.map((job) => ({
+            job_title: job.job_title,
+            company: job.company,
+            location: job.location,
+            from_date: job.from_date,
+            to_date: job.to_date,
+            description: job.description,
+        })));
+        populateSection("scientificInterests", cv.scientific_interests.map((interest) => ({
+            name: interest.name,
+            description: interest.description,
+        })));
+        populateSection("publications", cv.publications.map((publication) => ({
+            ...publication,
+            authors: publication.authors.join(", "),
+        })));
+        populateSection("awards", cv.awards.map((award) => ({
+            ...award,
+        })));
+        populateSection("subjects", cv.favorite_subjects_in_school.map((subject) => ({ subject })));
+    }
+    async function loadCvForEditing() {
+        const title = document.getElementById("form-title");
+        const description = document.getElementById("form-description");
+        if (title)
+            title.textContent = "Edit member's CV";
+        if (description)
+            description.textContent = "Update the CV details and save your changes.";
+        if (submitBtn) {
+            submitBtn.textContent = "Update CV";
+            submitBtn.disabled = true;
+        }
+        try {
+            const response = await fetch(`${API_URL}/${encodeURIComponent(cvId || "")}`);
+            if (!response.ok) {
+                const details = await response.text();
+                throw new Error(`HTTP ${response.status}: ${details || response.statusText}`);
+            }
+            const cv = await response.json();
+            populateForm(cv);
+            isFormDirty = false;
+            validateForm();
+        }
+        catch (error) {
+            console.error("Error loading CV for editing:", error);
+            if (validationFeedback) {
+                validationFeedback.textContent = `Could not load this CV. ${error instanceof Error ? error.message : "Please try again."}`;
+                validationFeedback.style.display = "block";
+            }
+            if (submitBtn)
+                submitBtn.disabled = true;
+        }
+    }
+    if (cvId)
+        void loadCvForEditing();
     function isValidDateStr(dateStr) {
         if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr))
             return false;
@@ -101,14 +274,19 @@ document.addEventListener("DOMContentLoaded", () => {
             errors.push("Date of birth is invalid or in the future.");
         }
         else {
-            const birthYear = new Date(birthDate).getFullYear();
-            const currentYear = new Date().getFullYear();
-            if (currentYear - birthYear < 14) {
+            const [birthYear, birthMonth, birthDay] = birthDate.split("-").map(Number);
+            const today = new Date();
+            let age = today.getFullYear() - birthYear;
+            if (today.getMonth() + 1 < birthMonth ||
+                (today.getMonth() + 1 === birthMonth && today.getDate() < birthDay)) {
+                age -= 1;
+            }
+            if (age < 14) {
                 errors.push("Age must be at least 14 years.");
             }
         }
         const emailVal = emailInput?.value.trim() || "";
-        if (!EMAIL_REGEX.test(emailVal) || !VALID_TLDS.test(emailVal)) {
+        if (!emailVal || emailInput?.validity.typeMismatch) {
             if (emailError)
                 emailError.textContent = "Invalid email format or domain.";
             errors.push("Invalid email address.");
@@ -126,68 +304,94 @@ document.addEventListener("DOMContentLoaded", () => {
             phoneError.textContent = "";
         }
         const hoursRaw = val("device-hours");
-        if (hoursRaw) {
-            const h = parseFloat(hoursRaw);
-            if (isNaN(h) || h < 0 || h > 168) {
-                errors.push("Weekly availability must be between 0 and 168 hours.");
-            }
+        const weeklyHours = Number(hoursRaw);
+        if (!hoursRaw) {
+            errors.push("Enter weekly availability.");
         }
-        const jobTitle = val("job-title");
-        if (jobTitle) {
-            if (jobTitle.length > 50)
-                errors.push("Job title cannot exceed 50 characters.");
-            const jobCompany = val("job-company");
-            if (!jobCompany || jobCompany.length > 50)
-                errors.push("Enter a company name (up to 50 characters).");
-            const jobLoc = val("job-location");
-            if (!jobLoc || jobLoc.length > 50)
-                errors.push("Enter a work location (up to 50 characters).");
-            const fromDate = val("job-from");
-            const toDate = val("job-to");
-            if (!fromDate || !isValidDateStr(fromDate)) {
-                errors.push("Enter a valid work start date.");
+        else if (!Number.isFinite(weeklyHours) || weeklyHours < 0 || weeklyHours > 168) {
+            errors.push("Weekly availability must be between 0 and 168 hours.");
+        }
+        const enteredData = (item) => Array.from(item.querySelectorAll("input, textarea"))
+            .some((control) => control.value.trim() !== "") ||
+            Boolean(item.querySelector('[data-field="subject"]')?.value);
+        const validateSection = (key, primaryField, primaryLabel, validateEntry) => {
+            for (const item of getSectionItems(key)) {
+                if (!enteredData(item))
+                    continue;
+                if (!getItemValue(item, primaryField)) {
+                    errors.push(`${primaryLabel} is required for each started entry.`);
+                    continue;
+                }
+                validateEntry(item);
             }
+        };
+        validateSection("programmingSkills", "language", "Programming language", (item) => {
+            if (getItemValue(item, "language").length > 50)
+                errors.push("Programming language cannot exceed 50 characters.");
+        });
+        validateSection("languages", "name", "Language name", (item) => {
+            if (getItemValue(item, "name").length > 30)
+                errors.push("Language name cannot exceed 30 characters.");
+        });
+        validateSection("workExperience", "job_title", "Position", (item) => {
+            const company = getItemValue(item, "company");
+            const location = getItemValue(item, "location");
+            const fromDate = getItemValue(item, "from_date");
+            const toDate = getItemValue(item, "to_date");
+            const description = getItemValue(item, "description");
+            if (getItemValue(item, "job_title").length > 50)
+                errors.push("Job title cannot exceed 50 characters.");
+            if (!company || company.length > 50)
+                errors.push("Enter a company name (up to 50 characters).");
+            if (!location || location.length > 50)
+                errors.push("Enter a work location (up to 50 characters).");
+            if (!fromDate || !isValidDateStr(fromDate))
+                errors.push("Enter a valid work start date.");
             if (toDate && (!isValidDateStr(toDate) || new Date(toDate) < new Date(fromDate))) {
                 errors.push("The end date cannot be earlier than the start date.");
             }
-            const jobDesc = val("job-desc");
-            if (jobDesc && (jobDesc.length < 10 || jobDesc.length > 300)) {
+            if (description && (description.length < 10 || description.length > 300)) {
                 errors.push("Work description must be 10 to 300 characters (or left blank).");
             }
-        }
-        const sciName = val("sci-name");
-        if (sciName) {
-            if (sciName.length > 100)
-                errors.push("Interest name: up to 100 characters.");
-            const sciDesc = val("sci-desc");
-            if (sciDesc && (sciDesc.length < 10 || sciDesc.length > 300)) {
-                errors.push("Interest description must be 10 to 300 characters.");
+        });
+        validateSection("scientificInterests", "name", "Scientific interest", (item) => {
+            const name = getItemValue(item, "name");
+            const description = getItemValue(item, "description");
+            if (name.length > 100)
+                errors.push("Interest name cannot exceed 100 characters.");
+            if (description && (description.length < 10 || description.length > 300)) {
+                errors.push("Interest description must be 10 to 300 characters (or left blank).");
             }
-        }
-        const pubTitle = val("pub-title");
-        if (pubTitle) {
-            if (pubTitle.length > 200)
-                errors.push("Publication title: up to 200 characters.");
-            const pubJournal = val("pub-journal");
-            if (pubJournal && pubJournal.length > 100)
-                errors.push("Publication journal: up to 100 characters.");
-            const pubDate = val("pub-date");
-            if (pubDate && (!isValidDateStr(pubDate) || isFutureDate(pubDate))) {
+        });
+        validateSection("publications", "title", "Publication title", (item) => {
+            const title = getItemValue(item, "title");
+            const journal = getItemValue(item, "journal");
+            const date = getItemValue(item, "publication_date");
+            if (title.length > 200)
+                errors.push("Publication title cannot exceed 200 characters.");
+            if (journal.length > 100)
+                errors.push("Publication journal cannot exceed 100 characters.");
+            if (date && (!isValidDateStr(date) || isFutureDate(date))) {
                 errors.push("Publication date cannot be in the future.");
             }
-        }
-        const awardTitle = val("award-title");
-        if (awardTitle) {
-            if (awardTitle.length > 100)
-                errors.push("Award title: up to 100 characters.");
-            const awardOrg = val("award-org");
-            if (awardOrg && awardOrg.length > 100)
-                errors.push("Award organization: up to 100 characters.");
-            const awardDate = val("award-date");
-            if (awardDate && (!isValidDateStr(awardDate) || isFutureDate(awardDate))) {
+        });
+        validateSection("awards", "title", "Award title", (item) => {
+            const title = getItemValue(item, "title");
+            const organization = getItemValue(item, "organization");
+            const date = getItemValue(item, "date");
+            const description = getItemValue(item, "description");
+            if (title.length > 100)
+                errors.push("Award title cannot exceed 100 characters.");
+            if (organization.length > 100)
+                errors.push("Award organization cannot exceed 100 characters.");
+            if (date && (!isValidDateStr(date) || isFutureDate(date))) {
                 errors.push("Award date cannot be in the future.");
             }
-        }
+            if (description && (description.length < 10 || description.length > 300)) {
+                errors.push("Award description must be 10 to 300 characters (or left blank).");
+            }
+        });
+        validateSection("subjects", "subject", "Favourite subject", () => undefined);
         if (validationFeedback) {
             if (errors.length > 0 && isFormDirty) {
                 validationFeedback.textContent = errors[0];
@@ -228,45 +432,64 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
     function buildRequestPayload(photoUrl) {
-        const rawAuthors = val("pub-authors");
-        const authors = rawAuthors ? rawAuthors.split(",").map(a => a.trim()).filter(Boolean) : [];
         const rawHobbies = val("hobbies");
         const hobbies = rawHobbies
             ? rawHobbies.split(",")
                 .map(h => ({ name: h.trim().slice(0, 50) }))
                 .filter(h => h.name.length > 0)
             : [];
-        const hasJob = Boolean(val("job-title"));
-        const workExperience = hasJob ? [{
-                job_title: val("job-title").slice(0, 50),
-                company: (val("job-company") || "Unknown").slice(0, 50),
-                location: (val("job-location") || "Remote").slice(0, 50),
-                from_date: val("job-from") || val("birth-date"),
-                to_date: val("job-to") ? val("job-to") : null,
-                description: cleanDescription(val("job-desc")),
-            }] : [];
-        const hasSci = Boolean(val("sci-name"));
-        const scientificInterests = hasSci ? [{
-                name: val("sci-name").slice(0, 100),
-                description: cleanDescription(val("sci-desc")),
-            }] : [];
-        const hasPub = Boolean(val("pub-title"));
-        const publications = hasPub ? [{
-                title: val("pub-title").slice(0, 200),
-                journal: val("pub-journal") ? val("pub-journal").slice(0, 100) : null,
-                publication_date: val("pub-date") ? val("pub-date") : null,
-                authors,
-                url: null,
-            }] : [];
-        const hasAward = Boolean(val("award-title"));
-        const awards = hasAward ? [{
-                title: val("award-title").slice(0, 100),
-                organization: val("award-org") ? val("award-org").slice(0, 100) : null,
-                date: val("award-date") ? val("award-date") : null,
-                description: null,
-            }] : [];
-        const hoursNum = parseFloat(val("device-hours"));
-        const weeklyHours = (!isNaN(hoursNum) && hoursNum >= 0) ? hoursNum : 40.0;
+        const programmingSkills = getSectionItems("programmingSkills")
+            .filter((item) => getItemValue(item, "language"))
+            .map((item) => ({
+            language: getItemValue(item, "language").slice(0, 50),
+            level: (getItemValue(item, "level") || "intermediate"),
+        }));
+        const languages = getSectionItems("languages")
+            .filter((item) => getItemValue(item, "name"))
+            .map((item) => ({
+            name: getItemValue(item, "name").slice(0, 30),
+            proficiency: (getItemValue(item, "proficiency") || "intermediate"),
+        }));
+        const workExperience = getSectionItems("workExperience")
+            .filter((item) => getItemValue(item, "job_title"))
+            .map((item) => ({
+            job_title: getItemValue(item, "job_title").slice(0, 50),
+            company: getItemValue(item, "company").slice(0, 50),
+            location: getItemValue(item, "location").slice(0, 50),
+            from_date: getItemValue(item, "from_date"),
+            to_date: getItemValue(item, "to_date") || null,
+            description: cleanDescription(getItemValue(item, "description")),
+        }));
+        const scientificInterests = getSectionItems("scientificInterests")
+            .filter((item) => getItemValue(item, "name"))
+            .map((item) => ({
+            name: getItemValue(item, "name").slice(0, 100),
+            description: cleanDescription(getItemValue(item, "description")),
+        }));
+        const publications = getSectionItems("publications")
+            .filter((item) => getItemValue(item, "title"))
+            .map((item) => {
+            const rawAuthors = getItemValue(item, "authors");
+            return {
+                title: getItemValue(item, "title").slice(0, 200),
+                journal: getItemValue(item, "journal").slice(0, 100) || null,
+                publication_date: getItemValue(item, "publication_date") || null,
+                authors: rawAuthors ? rawAuthors.split(",").map((author) => author.trim()).filter(Boolean) : [],
+                url: getItemValue(item, "url") || null,
+            };
+        });
+        const awards = getSectionItems("awards")
+            .filter((item) => getItemValue(item, "title"))
+            .map((item) => ({
+            title: getItemValue(item, "title").slice(0, 100),
+            organization: getItemValue(item, "organization").slice(0, 100) || null,
+            date: getItemValue(item, "date") || null,
+            description: cleanDescription(getItemValue(item, "description")),
+        }));
+        const subjects = getSectionItems("subjects")
+            .map((item) => getItemValue(item, "subject"))
+            .filter(Boolean);
+        const weeklyHours = Number(val("device-hours"));
         return {
             photo: photoUrl,
             personal_info: {
@@ -280,42 +503,51 @@ document.addEventListener("DOMContentLoaded", () => {
                 country_of_residence: val("country").slice(0, 30),
                 gender: (val("gender") || "other"),
             },
-            languages: val("lang-name") ? [{
-                    name: val("lang-name").slice(0, 30),
-                    proficiency: (val("lang-level") || "intermediate"),
-                }] : [],
+            languages,
             work_experience: workExperience,
             scientific_interests: scientificInterests,
             publications,
             awards,
-            favorite_subjects_in_school: [(val("school-subject") || "computer_science")],
-            programming_skills: val("prog-lang") ? [{
-                    language: val("prog-lang").slice(0, 50),
-                    level: (val("prog-level") || "intermediate"),
-                }] : [],
+            favorite_subjects_in_school: [...new Set(subjects)],
+            programming_skills: programmingSkills,
             device_access: {
                 weekly_hours: weeklyHours,
             },
             hobbies,
         };
     }
+    function buildUpdatePayload(payload) {
+        return {
+            photo: payload.photo,
+            "personal_info.first_name": payload.personal_info.first_name,
+            "personal_info.last_name": payload.personal_info.last_name,
+            "personal_info.preferred_name": payload.personal_info.preferred_name,
+            "personal_info.email": payload.personal_info.email,
+            "personal_info.phone": payload.personal_info.phone,
+            "personal_info.date_of_birth": payload.personal_info.date_of_birth,
+            "personal_info.nationality": payload.personal_info.nationality,
+            "personal_info.country_of_residence": payload.personal_info.country_of_residence,
+            "personal_info.gender": payload.personal_info.gender,
+            languages: payload.languages,
+            work_experience: payload.work_experience,
+            scientific_interests: payload.scientific_interests,
+            publications: payload.publications,
+            awards: payload.awards,
+            favorite_subjects_in_school: payload.favorite_subjects_in_school,
+            programming_skills: payload.programming_skills,
+            "device_access.weekly_hours": payload.device_access.weekly_hours,
+            hobbies: payload.hobbies,
+        };
+    }
     async function submitToBackend(payload) {
-        try {
-            const response = await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload),
-            });
-            if (!response.ok) {
-                const errData = await response.json();
-                console.error("FastAPI validation error (422):", errData);
-                return false;
-            }
-            return true;
-        }
-        catch (err) {
-            console.error("Network error while submitting:", err);
-            return false;
+        const response = await fetch(cvId ? `${API_URL}/${encodeURIComponent(cvId)}` : API_URL, {
+            method: cvId ? "PUT" : "POST",
+            headers: { "Content-Type": "application/json", ...getAdminApiHeaders() },
+            body: JSON.stringify(cvId ? buildUpdatePayload(payload) : payload),
+        });
+        if (!response.ok) {
+            const details = await response.text();
+            throw new Error(`HTTP ${response.status}: ${details || response.statusText}`);
         }
     }
     async function handleFormSubmit(e) {
@@ -324,23 +556,35 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         submitBtn.disabled = true;
         submitBtn.textContent = "Saving...";
-        let photoUrl = null;
+        let photoUrl = existingPhotoUrl;
         const photoFileInput = document.getElementById("photo-file");
         if (photoFileInput?.files?.[0]) {
             photoUrl = await uploadPhoto(photoFileInput.files[0]);
+            if (!photoUrl) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = cvId ? "Update CV" : "Save CV";
+                window.alert("The photo could not be uploaded. The CV was not saved.");
+                return;
+            }
         }
         const requestPayload = buildRequestPayload(photoUrl);
-        const isSuccess = await submitToBackend(requestPayload);
-        if (isSuccess) {
+        try {
+            await submitToBackend(requestPayload);
             isFormDirty = false;
-            alert("Resume saved successfully!");
+            if (cvId) {
+                window.location.assign(`/member.html?id=${encodeURIComponent(cvId)}`);
+                return;
+            }
+            window.alert("CV created successfully.");
             form.reset();
         }
-        else {
-            alert("Could not save the resume. Check the browser console for error details.");
+        catch (error) {
+            console.error("Error saving CV:", error);
+            window.alert(`Could not save the CV. ${error instanceof Error ? error.message : "Please try again."}`);
         }
         submitBtn.disabled = false;
-        submitBtn.textContent = "Save resume";
+        submitBtn.textContent = cvId ? "Update CV" : "Save CV";
+        validateForm();
     }
     form.addEventListener("submit", handleFormSubmit);
     validateForm();

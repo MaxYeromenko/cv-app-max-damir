@@ -9,6 +9,25 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="./src/css/importer.css">
+    <style>
+        .form-section form .repeat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--quaternary-color);
+            border-radius: 3px;
+        }
+
+        .form-section form .add-repeat-item,
+        .form-section form .remove-repeat-item {
+            align-self: flex-start;
+            width: fit-content;
+            padding: 8px 14px;
+            cursor: pointer;
+        }
+    </style>
     <title>Team CV Network | Add member</title>
 </head>
 
@@ -36,7 +55,7 @@
 
         <nav id="main-nav">
             <ul>
-                <li><a class="scaling" href="/" rel="noopener noreferrer">Main page</a></li>
+                <li><a class="scaling" href="/" rel="noopener noreferrer">Home</a></li>
                 <li><a class="scaling" href="/catalog.html" rel="noopener noreferrer">Catalog</a></li>
                 <!-- <li><a class="scaling" href="/add-member.html" rel="noopener noreferrer">Add CV</a></li> -->
             </ul>
@@ -51,8 +70,8 @@
 
     <main>
         <section class="form-section">
-            <h1>Add new member's CV</h1>
-            <p>Fill in all required fields to create a profile in the database.</p>
+            <h1 id="form-title">Add new member's CV</h1>
+            <p id="form-description">Fill in all required fields to create a profile in the database.</p>
 
             <form id="add-member-form" novalidate>
                 <fieldset>
@@ -118,126 +137,41 @@
                 <fieldset>
                     <legend>Skills & Languages</legend>
 
-                    <div class="form-group">
-                        <label for="prog-lang">Main Programming Language:</label>
-                        <input type="text" id="prog-lang" placeholder="TypeScript" />
-                    </div>
-                    <div class="form-group">
-                        <label for="prog-level">Programming level:</label>
-                        <select id="prog-level">
-                            <option value="beginner">Beginner</option>
-                            <option value="intermediate" selected>Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                            <option value="expert">Expert</option>
-                        </select>
-                    </div>
+                    <h3>Programming skills</h3>
+                    <div id="programming-skills-list"></div>
+                    <button type="button" class="cta-button add-repeat-item" data-add="programmingSkills">Add programming skill</button>
 
-                    <div class="form-group">
-                        <label for="lang-name">Foreign Language:</label>
-                        <input type="text" id="lang-name" placeholder="English" />
-                    </div>
-                    <div class="form-group">
-                        <label for="lang-level">Proficiency Level:</label>
-                        <select id="lang-level">
-                            <option value="beginner">Beginner</option>
-                            <option value="elementary">Elementary</option>
-                            <option value="intermediate">Intermediate</option>
-                            <option value="upper_intermediate" selected>Upper Intermediate</option>
-                            <option value="advanced">Advanced</option>
-                            <option value="native">Native</option>
-                        </select>
-                    </div>
+                    <h3>Languages</h3>
+                    <div id="languages-list"></div>
+                    <button type="button" class="cta-button add-repeat-item" data-add="languages">Add language</button>
                 </fieldset>
 
                 <fieldset>
-                    <legend>Last Place of Employment</legend>
-
-                    <div class="form-group">
-                        <label for="job-title">Position:</label>
-                        <input type="text" id="job-title" placeholder="Frontend Developer" />
-                    </div>
-                    <div class="form-group">
-                        <label for="job-company">Company Name:</label>
-                        <input type="text" id="job-company" placeholder="Tech Company" />
-                    </div>
-                    <div class="form-group">
-                        <label for="job-location">Location:</label>
-                        <input type="text" id="job-location" placeholder="Remote / Kyiv" />
-                    </div>
-                    <div class="form-group">
-                        <label for="job-from">Period from:</label>
-                        <input type="date" id="job-from" />
-                    </div>
-                    <div class="form-group">
-                        <label for="job-to">Period to:</label>
-                        <input type="date" id="job-to" />
-                    </div>
-                    <div class="form-group">
-                        <label for="job-desc">Job Description:</label>
-                        <textarea id="job-desc" rows="2" placeholder="UI/UX development, integration with API..."></textarea>
-                    </div>
+                    <legend>Work Experience</legend>
+                    <div id="work-experience-list"></div>
+                    <button type="button" class="cta-button add-repeat-item" data-add="workExperience">Add work experience</button>
                 </fieldset>
 
                 <fieldset>
                     <legend>Scientific Activities and Publications</legend>
+                    <h3>Scientific interests</h3>
+                    <div id="scientific-interests-list"></div>
+                    <button type="button" class="cta-button add-repeat-item" data-add="scientificInterests">Add scientific interest</button>
 
-                    <div class="form-group">
-                        <label for="sci-name">Scientific Interest:</label>
-                        <input type="text" id="sci-name" placeholder="Machine Learning" />
-                    </div>
-                    <div class="form-group">
-                        <label for="sci-desc">Interest Description:</label>
-                        <textarea id="sci-desc" rows="2" placeholder="Neural Network Research..."></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="pub-title">Publication Name:</label>
-                        <input type="text" id="pub-title" placeholder="Algorithm Research..." />
-                    </div>
-                    <div class="form-group">
-                        <label for="pub-journal">Journal / Conference:</label>
-                        <input type="text" id="pub-journal" placeholder="Science Journal" />
-                    </div>
-                    <div class="form-group">
-                        <label for="pub-date">Date of Publication:</label>
-                        <input type="date" id="pub-date" />
-                    </div>
-                    <div class="form-group">
-                        <label for="pub-authors">Authors (separated with comma):</label>
-                        <input type="text" id="pub-authors" placeholder="M. Petrenko, D. Ivanov" />
-                    </div>
+                    <h3>Publications</h3>
+                    <div id="publications-list"></div>
+                    <button type="button" class="cta-button add-repeat-item" data-add="publications">Add publication</button>
                 </fieldset>
 
                 <fieldset>
                     <legend>Awards and Favourite Subjects</legend>
+                    <h3>Awards</h3>
+                    <div id="awards-list"></div>
+                    <button type="button" class="cta-button add-repeat-item" data-add="awards">Add award</button>
 
-                    <div class="form-group">
-                        <label for="award-title">Award Name:</label>
-                        <input type="text" id="award-title" placeholder="Winner of Hackathon" />
-                    </div>
-                    <div class="form-group">
-                        <label for="award-org">Organization:</label>
-                        <input type="text" id="award-org" placeholder="IT KPI" />
-                    </div>
-                    <div class="form-group">
-                        <label for="award-date">Date:</label>
-                        <input type="date" id="award-date" />
-                    </div>
-                    <div class="form-group">
-                        <label for="school-subject">Favourite School Subject:</label>
-                        <select id="school-subject">
-                            <option value="computer_science" selected>Informatics</option>
-                            <option value="mathematics">Math</option>
-                            <option value="physics">Physics</option>
-                            <option value="chemistry">Chemistry</option>
-                            <option value="biology">Biology</option>
-                            <option value="history">History</option>
-                            <option value="geography">Geography</option>
-                            <option value="literature">Literature</option>
-                            <option value="english">English</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
+                    <h3>Favourite School Subjects</h3>
+                    <div id="subjects-list"></div>
+                    <button type="button" class="cta-button add-repeat-item" data-add="subjects">Add subject</button>
                 </fieldset>
 
                 <fieldset>
@@ -258,6 +192,109 @@
             </form>
         </section>
     </main>
+
+    <template id="programming-skill-template">
+        <div class="repeat-item" data-repeat-item>
+            <div class="form-group">
+                <label>Programming language:</label>
+                <input type="text" data-field="language" maxlength="50" placeholder="TypeScript" />
+            </div>
+            <div class="form-group">
+                <label>Programming level:</label>
+                <select data-field="level">
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate" selected>Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                    <option value="expert">Expert</option>
+                </select>
+            </div>
+            <button type="button" class="cta-button remove-repeat-item">Remove skill</button>
+        </div>
+    </template>
+
+    <template id="language-template">
+        <div class="repeat-item" data-repeat-item>
+            <div class="form-group">
+                <label>Language:</label>
+                <input type="text" data-field="name" maxlength="30" placeholder="English" />
+            </div>
+            <div class="form-group">
+                <label>Proficiency level:</label>
+                <select data-field="proficiency">
+                    <option value="beginner">Beginner</option>
+                    <option value="elementary">Elementary</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="upper_intermediate" selected>Upper Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                    <option value="native">Native</option>
+                </select>
+            </div>
+            <button type="button" class="cta-button remove-repeat-item">Remove language</button>
+        </div>
+    </template>
+
+    <template id="work-experience-template">
+        <div class="repeat-item" data-repeat-item>
+            <div class="form-group"><label>Position:</label><input type="text" data-field="job_title" maxlength="50" placeholder="Frontend Developer" /></div>
+            <div class="form-group"><label>Company:</label><input type="text" data-field="company" maxlength="50" placeholder="Tech Company" /></div>
+            <div class="form-group"><label>Location:</label><input type="text" data-field="location" maxlength="50" placeholder="Remote / Kyiv" /></div>
+            <div class="form-group"><label>Period from:</label><input type="date" data-field="from_date" /></div>
+            <div class="form-group"><label>Period to:</label><input type="date" data-field="to_date" /></div>
+            <div class="form-group"><label>Description:</label><textarea data-field="description" maxlength="300" rows="2" placeholder="UI/UX development, integration with API..."></textarea></div>
+            <button type="button" class="cta-button remove-repeat-item">Remove work experience</button>
+        </div>
+    </template>
+
+    <template id="scientific-interest-template">
+        <div class="repeat-item" data-repeat-item>
+            <div class="form-group"><label>Scientific interest:</label><input type="text" data-field="name" maxlength="100" placeholder="Machine Learning" /></div>
+            <div class="form-group"><label>Description:</label><textarea data-field="description" maxlength="300" rows="2" placeholder="Neural Network Research..."></textarea></div>
+            <button type="button" class="cta-button remove-repeat-item">Remove interest</button>
+        </div>
+    </template>
+
+    <template id="publication-template">
+        <div class="repeat-item" data-repeat-item>
+            <div class="form-group"><label>Publication title:</label><input type="text" data-field="title" maxlength="200" placeholder="Algorithm Research..." /></div>
+            <div class="form-group"><label>Journal / Conference:</label><input type="text" data-field="journal" maxlength="100" placeholder="Science Journal" /></div>
+            <div class="form-group"><label>Date of publication:</label><input type="date" data-field="publication_date" /></div>
+            <div class="form-group"><label>Authors (comma-separated):</label><input type="text" data-field="authors" placeholder="M. Petrenko, D. Ivanov" /></div>
+            <div class="form-group"><label>Publication URL:</label><input type="text" data-field="url" placeholder="https://example.com/publication" /></div>
+            <button type="button" class="cta-button remove-repeat-item">Remove publication</button>
+        </div>
+    </template>
+
+    <template id="award-template">
+        <div class="repeat-item" data-repeat-item>
+            <div class="form-group"><label>Award name:</label><input type="text" data-field="title" maxlength="100" placeholder="Winner of Hackathon" /></div>
+            <div class="form-group"><label>Organization:</label><input type="text" data-field="organization" maxlength="100" placeholder="Organization" /></div>
+            <div class="form-group"><label>Date:</label><input type="date" data-field="date" /></div>
+            <div class="form-group"><label>Description:</label><textarea data-field="description" minlength="10" maxlength="300" rows="2"></textarea></div>
+            <button type="button" class="cta-button remove-repeat-item">Remove award</button>
+        </div>
+    </template>
+
+    <template id="subject-template">
+        <div class="repeat-item" data-repeat-item>
+            <div class="form-group">
+                <label>Favourite school subject:</label>
+                <select data-field="subject">
+                    <option value="">Select a subject</option>
+                    <option value="computer_science">Informatics</option>
+                    <option value="mathematics">Math</option>
+                    <option value="physics">Physics</option>
+                    <option value="chemistry">Chemistry</option>
+                    <option value="biology">Biology</option>
+                    <option value="history">History</option>
+                    <option value="geography">Geography</option>
+                    <option value="literature">Literature</option>
+                    <option value="english">English</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <button type="button" class="cta-button remove-repeat-item">Remove subject</button>
+        </div>
+    </template>
 
     <footer id="footer">
         <p>&copy; <time id="current-year" datetime="2026">2026</time> Team CV Network by WebDUO. All rights reserved.</p>

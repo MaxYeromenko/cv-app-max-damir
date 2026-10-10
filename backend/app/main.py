@@ -1,4 +1,5 @@
 import logging
+import hmac
 from app.logging_config import setup_logging
 
 setup_logging()
@@ -10,7 +11,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query, Request, Depends, status
+from fastapi import FastAPI, Header, HTTPException, Query, Request, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import PlainTextResponse
@@ -32,6 +33,24 @@ async def lifespan(app: FastAPI):
 
 
 logger = logging.getLogger(__name__)
+
+async def require_admin_key(
+        x_admin_key: str | None = Header(default=None, alias="X-Admin-Key")
+) -> None:
+    admin_api_key = os.getenv("ADMIN_API_KEY")
+    if not admin_api_key:
+        logger.error("ADMIN_API_KEY is not configured; write operation rejected.")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Write operations are temporarily unavailable.",
+        )
+
+    if not x_admin_key or not hmac.compare_digest(x_admin_key, admin_api_key):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing admin key.",
+        )
+
 
 _origins: str | None = os.getenv('ALLOWED_ORIGINS')
 
@@ -224,6 +243,7 @@ async def get_all_user_cvs(
 async def create_user_cv(
         request: Request,
         user_cv: UserCVRequest,
+        _: None = Depends(require_admin_key),
         cvs = Depends(get_collection)
 
 ) -> dict[str, str]:
@@ -248,6 +268,7 @@ async def update_user_cv(
         request: Request,
         user_id: str,
         fields_to_update: dict[str, Any],
+        _: None = Depends(require_admin_key),
         cvs = Depends(get_collection)
 ) -> dict[str, Any]:
     try:
@@ -302,6 +323,7 @@ async def update_user_cv(
 async def delete_user_cv(
         request: Request,
         user_id: str,
+        _: None = Depends(require_admin_key),
         cvs = Depends(get_collection)
 ) -> dict[str, str]:
     try:

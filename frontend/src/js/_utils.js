@@ -13,3 +13,7 @@ export function setElementText(id, text) {
     if (el)
         el.textContent = text;
 }
+export function getAdminApiHeaders() {
+    const key = localStorage.getItem("adminApiKey");
+    return key ? { "X-Admin-Key": key } : {};
+}

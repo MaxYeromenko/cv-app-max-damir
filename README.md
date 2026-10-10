@@ -54,7 +54,22 @@ Create a `backend/.env` file:
 ```env
 MONGODB_URI=mongodb+srv://...
 ALLOWED_ORIGINS=https://your-frontend.vercel.app,http://localhost:5173
+ADMIN_API_KEY=replace-with-a-long-random-secret
 ```
+
+Set `ADMIN_API_KEY` in the backend host's environment settings as well. Never put
+the real value in frontend code or commit it to the repository. `POST`, `PUT`,
+and `DELETE` CV endpoints require it in the `X-Admin-Key` header; `GET` endpoints
+remain public. To authorize the frontend in a browser, manually run this in that
+site's developer console, replacing the placeholder with the configured secret:
+
+```js
+localStorage.setItem("adminApiKey", "replace-with-the-real-secret");
+```
+
+This is a shared admin key, not per-user authentication. Anyone who can access
+the browser's local storage can use it. If the key is missing on the backend,
+write requests fail closed with `503`.
 
 Run:
 
@@ -85,9 +100,9 @@ Base path: `/api/v1/users-cvs`
 | GET | `/` | Healthcheck |
 | GET | `/api/v1/users-cvs` | List CVs (pagination via `skip`, `limit` ≤ 100) |
 | GET | `/api/v1/users-cvs/{user_id}` | Single CV by ObjectId |
-| POST | `/api/v1/users-cvs` | Create a CV |
-| PUT | `/api/v1/users-cvs/{user_id}` | Partial update (allowlisted fields only) |
-| DELETE | `/api/v1/users-cvs/{user_id}` | Delete a CV |
+| POST | `/api/v1/users-cvs` | Create a CV (requires `X-Admin-Key`) |
+| PUT | `/api/v1/users-cvs/{user_id}` | Partial update (allowlisted fields only; requires `X-Admin-Key`) |
+| DELETE | `/api/v1/users-cvs/{user_id}` | Delete a CV (requires `X-Admin-Key`) |
 
 Rate limit: 20–30 requests/minute depending on the endpoint.
 

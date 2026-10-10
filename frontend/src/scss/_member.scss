@@ -6,22 +6,28 @@ main.member-main {
 
     .action-bar {
         @extend %centered-flex;
+        flex-direction: column;
         width: 100%;
         max-width: 850px;
 
-        .pdf-btn,
-        .return-btn {
-            padding: 8px 14px;
-            transform: none !important;
-            font-size: 1rem;
+        .action-bar-row {
+            @extend %centered-flex;
             width: 100%;
-        }
 
-        .return-btn {
-            background-color: transparent;
+            a,
+            button {
+                padding: 8px 14px;
+                transform: none !important;
+                font-size: 1rem;
+                width: 100%;
+            }
 
-            &:hover {
-                background-color: rgba(255, 255, 255, 0.1);
+            .return-btn {
+                background-color: transparent;
+
+                &:hover {
+                    background-color: rgba(255, 255, 255, 0.1);
+                }
             }
         }
     }
