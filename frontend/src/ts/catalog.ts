@@ -9,7 +9,7 @@ import {
     PROFICIENCY_LABELS,
     PROGRAMMING_LEVEL_LABELS,
 } from "./_types.js";
-import { escapeHtml, getAdminApiHeaders } from "./_utils.js";
+import { escapeHtml } from "./_utils.js";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -97,12 +97,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                 </div>
                     <a href="/member.html?id=${encodeURIComponent(cv.id)}" class="cta-button" rel="noopener noreferrer">View profile</a>
-                    <button type="button" class="cta-button delete-cv-btn" data-cv-id="${escapeHtml(cv.id)}" aria-label="Delete CV for ${fullName}">Delete</button>
                 </article>
             `;
-            row.querySelector<HTMLButtonElement>(".delete-cv-btn")?.addEventListener("click", () => {
-                void deleteMember(cv);
-            });
             return row;
     }
 
@@ -147,27 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateTotalCount(): void {
         const totalCount = document.getElementById("total-count");
         if (totalCount) totalCount.textContent = `${filteredMembers.length} CV${filteredMembers.length === 1 ? "" : "s"}`;
-    }
-
-    async function deleteMember(cv: UserCV): Promise<void> {
-        const fullName = `${cv.personal_info.first_name} ${cv.personal_info.last_name}`;
-        if (!window.confirm(`Delete the CV for ${fullName}? This action cannot be undone.`)) return;
-
-        try {
-            const response = await fetch(`${API_URL}/${encodeURIComponent(cv.id)}`, {
-                method: "DELETE",
-                headers: getAdminApiHeaders(),
-            });
-            if (!response.ok) {
-                const details = await response.text();
-                throw new Error(`HTTP ${response.status}: ${details || response.statusText}`);
-            }
-            allMembers = allMembers.filter((member) => member.id !== cv.id);
-            applyFilters();
-        } catch (error) {
-            console.error("Error deleting CV:", error);
-            window.alert(`Could not delete the CV. ${error instanceof Error ? error.message : "Please try again."}`);
-        }
     }
 
     function updatePaginationUI(totalPages: number): void {
