@@ -260,7 +260,62 @@ async def create_user_cv(
     logger.info("Successfully created doc in db.")
     return answer
 
+
 @app.put("/api/v1/users-cvs/{user_id}",
+         tags=["users-cvs"],
+         status_code=status.HTTP_200_OK)
+@limiter.limit("30/minute")
+async def update_full_user_cv(
+        request: Request,
+        user_id: str,
+        new_doc: dict[str, Any],
+        _: None = Depends(require_admin_key),
+        cvs = Depends(get_collection)
+) -> dict[str, Any]:
+    try:
+        _id = ObjectId(user_id)
+    except InvalidId as err:
+        logger.error(str(err), exc_info=err)
+        raise HTTPException(status_code=400, detail=str(err))
+
+
+    try:
+        UserCVRequest.model_validate(**new_doc)
+    except HTTPException as err:
+        logger.error("Failed to validate new document.", exc_info=err)
+        raise
+    except Exception as err:
+        logger.error("New document is not valid.", exc_info=err)
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "message": "New document is not valid.",
+            },
+        )
+
+    try:
+        result = await cvs.update_one({
+            "_id": _id
+        },{
+            "$set": jsonable_encoder(new_doc)
+        })
+    except Exception as err:
+        logger.error("Failed to update doc in db.", exc_info=err)
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+    if result.matched_count == 0:
+        logger.warning("No matched doc was founded.")
+        raise HTTPException(status_code=404, detail="CV not found")
+
+    answer = {
+        "id": user_id,
+        "status": "updated",
+        "new_document": new_doc
+    }
+    logger.info("Successfully updated doc in db.")
+    return answer
+
+@app.patch("/api/v1/users-cvs/{user_id}",
          tags=["users-cvs"],
          status_code=status.HTTP_200_OK)
 @limiter.limit("30/minute")
