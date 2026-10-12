@@ -42,9 +42,9 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/APIErrorResponse"
+                                $ref: "#/components/schemas/RateLimitErrorResponse"
                             example:
-                                detail: Rate limit exceeded
+                                error: "Rate limit exceeded: 30 per 1 minute"
     /api/v1/users-cvs/{user_id}:
         get:
             tags:
@@ -129,7 +129,8 @@ paths:
                                     ]
                                 device_access:
                                     weekly_hours: 25
-                                hobbies: [{ name: "Coding" }, { name: "Football" }]
+                                hobbies:
+                                    [{ name: "Coding" }, { name: "Football" }]
                 "400":
                     description: Bad Request
                     content:
@@ -155,6 +156,14 @@ paths:
                                 $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: Internal Server Error.
+                "429":
+                    description: Too Many Requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/RateLimitErrorResponse"
+                            example:
+                                error: "Rate limit exceeded: 30 per 1 minute"
         patch:
             tags:
                 - users-cvs
@@ -217,7 +226,8 @@ paths:
                             example:
                                 detail:
                                     message: Some fields are not valid update paths.
-                                    invalid_fields: ["house_number", "relatives"]
+                                    invalid_fields:
+                                        ["house_number", "relatives"]
                                     allowed_fields:
                                         [
                                             "photo",
@@ -238,8 +248,16 @@ paths:
                                             "favorite_subjects_in_school",
                                             "programming_skills",
                                             "device_access.weekly_hours",
-                                            "hobbies"
+                                            "hobbies",
                                         ]
+                "429":
+                    description: Too Many Requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/RateLimitErrorResponse"
+                            example:
+                                error: "Rate limit exceeded: 30 per 1 minute"
 
         put:
             tags:
@@ -293,7 +311,8 @@ paths:
                                         description: Interested in machine learning and backend automation.,
                                     },
                                 ]
-                            publications: [{ title: AI Future, authors: ["me"] }]
+                            publications:
+                                [{ title: AI Future, authors: ["me"] }]
                             awards:
                                 [
                                     {
@@ -395,7 +414,11 @@ paths:
                                         ]
                                     device_access:
                                         weekly_hours: 25
-                                    hobbies: [{ name: "Coding" }, { name: "Football" }]
+                                    hobbies:
+                                        [
+                                            { name: "Coding" },
+                                            { name: "Football" },
+                                        ]
 
                 "400":
                     description: Bad Request
@@ -417,6 +440,14 @@ paths:
                             example:
                                 detail:
                                     message: New document is not valid.
+                "429":
+                    description: Too Many Requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/RateLimitErrorResponse"
+                            example:
+                                error: "Rate limit exceeded: 30 per 1 minute"
 
         delete:
             tags:
@@ -467,6 +498,14 @@ paths:
                                 $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: Internal Server Error.
+                "429":
+                    description: Too Many Requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/RateLimitErrorResponse"
+                            example:
+                                error: "Rate limit exceeded: 30 per 1 minute"
 
     /api/v1/users-cvs:
         get:
@@ -510,6 +549,14 @@ paths:
                                 skip: 0
                                 limit: 10
                                 items: []
+                "429":
+                    description: Too Many Requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/RateLimitErrorResponse"
+                            example:
+                                error: "Rate limit exceeded: 20 per 1 minute"
                 "500":
                     description: Internal Server Error
                     content:
@@ -563,7 +610,8 @@ paths:
                                         description: Interested in machine learning and backend automation.,
                                     },
                                 ]
-                            publications: [{ title: AI Future, authors: ["me"] }]
+                            publications:
+                                [{ title: AI Future, authors: ["me"] }]
                             awards:
                                 [
                                     {
@@ -607,8 +655,26 @@ paths:
                                 $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: Internal Server Error.
+                "429":
+                    description: Too Many Requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/RateLimitErrorResponse"
+                            example:
+                                error: "Rate limit exceeded: 30 per 1 minute"
 components:
     schemas:
+        RateLimitErrorResponse:
+            properties:
+                error:
+                    type: string
+                    title: Error
+            additionalProperties: false
+            type: object
+            required:
+                - error
+            title: RateLimitErrorResponse
         APIErrorResponse:
             properties:
                 detail:
