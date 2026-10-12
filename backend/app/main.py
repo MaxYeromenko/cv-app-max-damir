@@ -119,7 +119,9 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 
 class PathError(Exception):
-    pass
+    def __init__(self, field: str):
+        self.field = field
+        super().__init__(f"{field} is not a valid path.")
 
 
 def get_by_dot_path(doc: dict[str, Any], path: str) -> Any:
@@ -128,6 +130,26 @@ def get_by_dot_path(doc: dict[str, Any], path: str) -> Any:
           current = current[key]
 
       return current
+
+def flatten_update_fields(fields_to_update: dict[str, Any]) -> dict[str, Any]:
+    flattened_fields = {}
+
+    def flatten(path: str, value: Any) -> None:
+        if isinstance(value, dict) and value:
+            for key, nested_value in value.items():
+                nested_path = f"{path}.{key}" if path else key
+                if "." in key:
+                    raise PathError(nested_path)
+                flatten(nested_path, nested_value)
+        else:
+            flattened_fields[path] = value
+
+    for field, value in fields_to_update.items():
+        if "." in field:
+            raise PathError(field)
+        flatten(field, value)
+
+    return flattened_fields
 
 def get_collection(request: Request):
     return request.app.state.db.collection
@@ -139,7 +161,7 @@ async def validate_fields_to_update(cvs, _id: ObjectId, fields_to_update: dict[s
 
     for field in fields:
         if field not in USER_CV_UPDATE_ALLOWED_FIELDS:
-            raise PathError(f"{field} is not a valid path.")
+            raise PathError(field)
 
     doc = await cvs.find_one({"_id": _id})
     if doc is None:
@@ -280,7 +302,8 @@ async def update_full_user_cv(
 
 
     try:
-        UserCVRequest.model_validate(**new_doc)
+        validated_doc = UserCVRequest.model_validate(new_doc)
+        document_to_store = jsonable_encoder(validated_doc)
     except HTTPException as err:
         logger.error("Failed to validate new document.", exc_info=err)
         raise
@@ -294,10 +317,11 @@ async def update_full_user_cv(
         )
 
     try:
-        result = await cvs.update_one({
+        result = await cvs.replace_one({
             "_id": _id
-        },{
-            "$set": jsonable_encoder(new_doc)
+        }, {
+            "_id": _id,
+            **document_to_store,
         })
     except Exception as err:
         logger.error("Failed to update doc in db.", exc_info=err)
@@ -310,7 +334,7 @@ async def update_full_user_cv(
     answer = {
         "id": user_id,
         "status": "updated",
-        "new_document": new_doc
+        "new_document": document_to_store,
     }
     logger.info("Successfully updated doc in db.")
     return answer
@@ -333,18 +357,30 @@ async def update_user_cv(
         raise HTTPException(status_code=400, detail=str(err))
 
 
+    flattened_fields = {}
     try:
-        validated_fields = await validate_fields_to_update(cvs, _id, fields_to_update)
+        flattened_fields = flatten_update_fields(fields_to_update)
+        validated_fields = await validate_fields_to_update(cvs, _id, flattened_fields)
     except HTTPException as err:
         logger.error("Failed to validate fields to update.", exc_info=err)
         raise
+    except PathError as err:
+        logger.error("Fields to update are not valid paths.", exc_info=err)
+        raise HTTPException(
+            status_code=422,
+            detail={
+                "message": "Some fields are not valid update paths.",
+                "invalid_fields": [err.field],
+                "allowed_fields": sorted(USER_CV_UPDATE_ALLOWED_FIELDS),
+            },
+        )
     except Exception as err:
         logger.error("Fields to update are not valid.", exc_info=err)
         raise HTTPException(
             status_code=422,
             detail={
                 "message": "Some fields are not valid update paths.",
-                "invalid_fields": sorted(set(fields_to_update.keys()) - set(USER_CV_UPDATE_ALLOWED_FIELDS)),
+                "invalid_fields": sorted(set(flattened_fields) - set(USER_CV_UPDATE_ALLOWED_FIELDS)),
                 "allowed_fields": sorted(USER_CV_UPDATE_ALLOWED_FIELDS),
             },
         )

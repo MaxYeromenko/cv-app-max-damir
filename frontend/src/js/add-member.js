@@ -516,34 +516,11 @@ document.addEventListener("DOMContentLoaded", () => {
             hobbies,
         };
     }
-    function buildUpdatePayload(payload) {
-        return {
-            photo: payload.photo,
-            "personal_info.first_name": payload.personal_info.first_name,
-            "personal_info.last_name": payload.personal_info.last_name,
-            "personal_info.preferred_name": payload.personal_info.preferred_name,
-            "personal_info.email": payload.personal_info.email,
-            "personal_info.phone": payload.personal_info.phone,
-            "personal_info.date_of_birth": payload.personal_info.date_of_birth,
-            "personal_info.nationality": payload.personal_info.nationality,
-            "personal_info.country_of_residence": payload.personal_info.country_of_residence,
-            "personal_info.gender": payload.personal_info.gender,
-            languages: payload.languages,
-            work_experience: payload.work_experience,
-            scientific_interests: payload.scientific_interests,
-            publications: payload.publications,
-            awards: payload.awards,
-            favorite_subjects_in_school: payload.favorite_subjects_in_school,
-            programming_skills: payload.programming_skills,
-            "device_access.weekly_hours": payload.device_access.weekly_hours,
-            hobbies: payload.hobbies,
-        };
-    }
     async function submitToBackend(payload) {
         const response = await fetch(cvId ? `${API_URL}/${encodeURIComponent(cvId)}` : API_URL, {
             method: cvId ? "PUT" : "POST",
             headers: { "Content-Type": "application/json", ...getAdminApiHeaders() },
-            body: JSON.stringify(cvId ? buildUpdatePayload(payload) : payload),
+            body: JSON.stringify(payload),
         });
         if (!response.ok) {
             const details = await response.text();
