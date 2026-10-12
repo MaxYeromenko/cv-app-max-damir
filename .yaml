@@ -37,6 +37,14 @@ paths:
                         application/json:
                             example:
                                 status: ok
+                "429":
+                    description: Too Many Requests
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/APIErrorResponse"
+                            example:
+                                detail: Rate limit exceeded
     /api/v1/users-cvs/{user_id}:
         get:
             tags:
@@ -55,7 +63,10 @@ paths:
                     description: Successful Response
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/UserCVResponse"
                             example:
+                                id: null
                                 photo: null
                                 personal_info:
                                     first_name: John
@@ -72,7 +83,10 @@ paths:
                                             name: English,
                                             proficiency: advanced,
                                         },
-                                        { name: Ukrainian, proficiency: native },
+                                        {
+                                            name: Ukrainian,
+                                            proficiency: native,
+                                        },
                                     ]
                                 work_experience:
                                     [
@@ -81,7 +95,7 @@ paths:
                                             location: Zurich,
                                             company: Tech Studio,
                                             from_date: "2024-06-01",
-                                            to_date: "2024-09-012",
+                                            to_date: "2024-09-12",
                                             description: Developed backend APIs and worked with databases.,
                                         },
                                     ]
@@ -93,7 +107,7 @@ paths:
                                         },
                                     ]
                                 publications:
-                                    [{ title: AI Future, authors: [me] }]
+                                    [{ title: AI Future, authors: ["me"] }]
                                 awards:
                                     [
                                         {
@@ -115,24 +129,30 @@ paths:
                                     ]
                                 device_access:
                                     weekly_hours: 25
-                                hobbies: [name: Coding, name: Football]
+                                hobbies: [{ name: "Coding" }, { name: "Football" }]
                 "400":
-                    description: Validation Error
+                    description: Bad Request
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: 1 is not a valid ObjectId, it must be a 12-byte input or a 24-character hex string
 
                 "404":
-                    description: HTTPValidationError
+                    description: Not Found
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: CV not found.
                 "500":
                     description: Internal Server Error
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: Internal Server Error.
         patch:
@@ -178,45 +198,48 @@ paths:
                                         preferred_name: John
 
                 "400":
-                    description: Validation Error
+                    description: Bad Request
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: 1 is not a valid ObjectId, it must be a 12-byte input or a 24-character hex string
 
                 "422":
-                    description: HTTPValidationError
+                    description: Validation Error
                     content:
                         application/json:
+                            schema:
+                                oneOf:
+                                    - $ref: "#/components/schemas/HTTPValidationError"
+                                    - $ref: "#/components/schemas/UpdateValidationErrorResponse"
                             example:
-                                message: Some fields are not valid update paths.
-                                invalid_fields: ["house_number", "relatives"]
-                                allowed_fields:
-                                    [
-                                        "photo",
-
-                                        "personal_info.first_name",
-                                        "personal_info.last_name",
-                                        "personal_info.preferred_name",
-                                        "personal_info.email",
-                                        "personal_info.phone",
-                                        "personal_info.date_of_birth",
-                                        "personal_info.nationality",
-                                        "personal_info.country_of_residence",
-                                        "personal_info.gender",
-
-                                        "languages",
-                                        "work_experience",
-                                        "scientific_interests",
-                                        "publications",
-                                        "awards",
-                                        "favorite_subjects_in_school",
-                                        "programming_skills",
-
-                                        "device_access.weekly_hours",
-
-                                        "hobbies",
-                                    ]
+                                detail:
+                                    message: Some fields are not valid update paths.
+                                    invalid_fields: ["house_number", "relatives"]
+                                    allowed_fields:
+                                        [
+                                            "photo",
+                                            "personal_info.first_name",
+                                            "personal_info.last_name",
+                                            "personal_info.preferred_name",
+                                            "personal_info.email",
+                                            "personal_info.phone",
+                                            "personal_info.date_of_birth",
+                                            "personal_info.nationality",
+                                            "personal_info.country_of_residence",
+                                            "personal_info.gender",
+                                            "languages",
+                                            "work_experience",
+                                            "scientific_interests",
+                                            "publications",
+                                            "awards",
+                                            "favorite_subjects_in_school",
+                                            "programming_skills",
+                                            "device_access.weekly_hours",
+                                            "hobbies"
+                                        ]
 
         put:
             tags:
@@ -235,9 +258,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: object
-                            additionalProperties: true
-                            title: Fields To Update
+                            $ref: "#/components/schemas/UserCVRequest"
                         example:
                             photo: null
                             personal_info:
@@ -261,7 +282,7 @@ paths:
                                         location: Zurich,
                                         company: Tech Studio,
                                         from_date: "2024-06-01",
-                                        to_date: "2024-09-012",
+                                        to_date: "2024-09-12",
                                         description: Developed backend APIs and worked with databases.,
                                     },
                                 ]
@@ -272,7 +293,7 @@ paths:
                                         description: Interested in machine learning and backend automation.,
                                     },
                                 ]
-                            publications: [{ title: AI Future, authors: [me] }]
+                            publications: [{ title: AI Future, authors: ["me"] }]
                             awards:
                                 [
                                     {
@@ -294,7 +315,7 @@ paths:
                                 ]
                             device_access:
                                 weekly_hours: 25
-                            hobbies: [name: Coding, name: Football]
+                            hobbies: [{ name: "Coding" }, { name: "Football" }]
 
             responses:
                 "200":
@@ -337,7 +358,7 @@ paths:
                                                 location: Zurich,
                                                 company: Tech Studio,
                                                 from_date: "2024-06-01",
-                                                to_date: "2024-09-012",
+                                                to_date: "2024-09-12",
                                                 description: Developed backend APIs and worked with databases.,
                                             },
                                         ]
@@ -349,7 +370,7 @@ paths:
                                             },
                                         ]
                                     publications:
-                                        [{ title: AI Future, authors: [me] }]
+                                        [{ title: AI Future, authors: ["me"] }]
                                     awards:
                                         [
                                             {
@@ -374,21 +395,28 @@ paths:
                                         ]
                                     device_access:
                                         weekly_hours: 25
-                                    hobbies: [name: Coding, name: Football]
+                                    hobbies: [{ name: "Coding" }, { name: "Football" }]
 
                 "400":
-                    description: Validation Error
+                    description: Bad Request
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: 1 is not a valid ObjectId, it must be a 12-byte input or a 24-character hex string
 
                 "422":
-                    description: HTTPValidationError
+                    description: Validation Error
                     content:
                         application/json:
+                            schema:
+                                oneOf:
+                                    - $ref: "#/components/schemas/HTTPValidationError"
+                                    - $ref: "#/components/schemas/UpdateValidationErrorResponse"
                             example:
-                                message: New document is not valid.
+                                detail:
+                                    message: New document is not valid.
 
         delete:
             tags:
@@ -416,21 +444,27 @@ paths:
                                 id: 507f1f77bcf86cd799439011
                                 status: deleted
                 "400":
-                    description: Validation Error
+                    description: Bad Request
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: 1 is not a valid ObjectId, it must be a 12-byte input or a 24-character hex string
                 "404":
-                    description: HTTPValidationError
+                    description: Not Found
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: CV not found.
                 "500":
                     description: Internal Server Error
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: Internal Server Error.
 
@@ -480,6 +514,8 @@ paths:
                     description: Internal Server Error
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: Internal Server Error.
         post:
@@ -491,6 +527,8 @@ paths:
                 required: true
                 content:
                     application/json:
+                        schema:
+                            $ref: "#/components/schemas/UserCVRequest"
                         example:
                             photo: null
                             personal_info:
@@ -514,7 +552,7 @@ paths:
                                         location: Zurich,
                                         company: Tech Studio,
                                         from_date: "2024-06-01",
-                                        to_date: "2024-09-012",
+                                        to_date: "2024-09-12",
                                         description: Developed backend APIs and worked with databases.,
                                     },
                                 ]
@@ -525,7 +563,7 @@ paths:
                                         description: Interested in machine learning and backend automation.,
                                     },
                                 ]
-                            publications: [{ title: AI Future, authors: [me] }]
+                            publications: [{ title: AI Future, authors: ["me"] }]
                             awards:
                                 [
                                     {
@@ -547,7 +585,7 @@ paths:
                                 ]
                             device_access:
                                 weekly_hours: 25
-                            hobbies: [name: Coding, name: Football]
+                            hobbies: [{ name: "Coding" }, { name: "Football" }]
             responses:
                 "201":
                     description: Successful Response
@@ -565,10 +603,49 @@ paths:
                     description: Internal Server Error
                     content:
                         application/json:
+                            schema:
+                                $ref: "#/components/schemas/APIErrorResponse"
                             example:
                                 detail: Internal Server Error.
 components:
     schemas:
+        APIErrorResponse:
+            properties:
+                detail:
+                    type: string
+                    title: Detail
+            additionalProperties: false
+            type: object
+            required:
+                - detail
+            title: APIErrorResponse
+        UpdateValidationErrorResponse:
+            properties:
+                detail:
+                    properties:
+                        message:
+                            type: string
+                            title: Message
+                        invalid_fields:
+                            items:
+                                type: string
+                            type: array
+                            title: Invalid Fields
+                        allowed_fields:
+                            items:
+                                type: string
+                            type: array
+                            title: Allowed Fields
+                    additionalProperties: false
+                    type: object
+                    required:
+                        - message
+                    title: Update Validation Error
+            additionalProperties: false
+            type: object
+            required:
+                - detail
+            title: UpdateValidationErrorResponse
         Award:
             properties:
                 title:
@@ -863,6 +940,11 @@ components:
             title: UserCVRequest
         UserCVResponse:
             properties:
+                id:
+                    anyOf:
+                        - type: string
+                        - type: "null"
+                    title: Id
                 photo:
                     anyOf:
                         - type: string
