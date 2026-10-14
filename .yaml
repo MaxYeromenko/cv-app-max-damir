@@ -65,72 +65,7 @@ paths:
                         application/json:
                             schema:
                                 $ref: "#/components/schemas/UserCVResponse"
-                            example:
-                                id: null
-                                photo: null
-                                personal_info:
-                                    first_name: John
-                                    last_name: Peterson
-                                    email: email@example.com
-                                    phone: "+41791234567"
-                                    date_of_birth: "2005-04-15"
-                                    nationality: Swiss
-                                    country_of_residence: Switzerland
-                                    gender: male
-                                languages:
-                                    [
-                                        {
-                                            name: English,
-                                            proficiency: advanced,
-                                        },
-                                        {
-                                            name: Ukrainian,
-                                            proficiency: native,
-                                        },
-                                    ]
-                                work_experience:
-                                    [
-                                        {
-                                            job_title: Junior Python Developer,
-                                            location: Zurich,
-                                            company: Tech Studio,
-                                            from_date: "2024-06-01",
-                                            to_date: "2024-09-12",
-                                            description: Developed backend APIs and worked with databases.,
-                                        },
-                                    ]
-                                scientific_interests:
-                                    [
-                                        {
-                                            name: Artificial Intelligence,
-                                            description: Interested in machine learning and backend automation.,
-                                        },
-                                    ]
-                                publications:
-                                    [{ title: AI Future, authors: ["me"] }]
-                                awards:
-                                    [
-                                        {
-                                            title: Best Student Project,
-                                            organization: School,
-                                            date: "2023-05-20",
-                                            description: Won an award for a software development project.,
-                                        },
-                                    ]
-                                favorite_subjects_in_school:
-                                    [mathematics, computer_science, physics]
-                                programming_skills:
-                                    [
-                                        { language: Python, level: advanced },
-                                        {
-                                            language: JavaScript,
-                                            level: intermediate,
-                                        },
-                                    ]
-                                device_access:
-                                    weekly_hours: 25
-                                hobbies:
-                                    [{ name: "Coding" }, { name: "Football" }]
+
                 "400":
                     description: Bad Request
                     content:
@@ -277,64 +212,6 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/UserCVRequest"
-                        example:
-                            photo: null
-                            personal_info:
-                                first_name: John
-                                last_name: Peterson
-                                email: email@example.com
-                                phone: "+41791234567"
-                                date_of_birth: "2005-04-15"
-                                nationality: Swiss
-                                country_of_residence: Switzerland
-                                gender: male
-                            languages:
-                                [
-                                    { name: English, proficiency: advanced },
-                                    { name: Ukrainian, proficiency: native },
-                                ]
-                            work_experience:
-                                [
-                                    {
-                                        job_title: Junior Python Developer,
-                                        location: Zurich,
-                                        company: Tech Studio,
-                                        from_date: "2024-06-01",
-                                        to_date: "2024-09-12",
-                                        description: Developed backend APIs and worked with databases.,
-                                    },
-                                ]
-                            scientific_interests:
-                                [
-                                    {
-                                        name: Artificial Intelligence,
-                                        description: Interested in machine learning and backend automation.,
-                                    },
-                                ]
-                            publications:
-                                [{ title: AI Future, authors: ["me"] }]
-                            awards:
-                                [
-                                    {
-                                        title: Best Student Project,
-                                        organization: School,
-                                        date: "2023-05-20",
-                                        description: Won an award for a software development project.,
-                                    },
-                                ]
-                            favorite_subjects_in_school:
-                                [mathematics, computer_science, physics]
-                            programming_skills:
-                                [
-                                    { language: Python, level: advanced },
-                                    {
-                                        language: JavaScript,
-                                        level: intermediate,
-                                    },
-                                ]
-                            device_access:
-                                weekly_hours: 25
-                            hobbies: [{ name: "Coding" }, { name: "Football" }]
 
             responses:
                 "200":
@@ -345,80 +222,7 @@ paths:
                                 type: object
                                 additionalProperties: true
                                 title: Response Update User Cv Api V1 Users Cvs  User Id  Put
-                            example:
-                                id: 507f1f77bcf86cd799439011
-                                status: updated
-                                new_document:
-                                    photo: null
-                                    personal_info:
-                                        first_name: John
-                                        last_name: Peterson
-                                        email: email@example.com
-                                        phone: "+41791234567"
-                                        date_of_birth: "2005-04-15"
-                                        nationality: Swiss
-                                        country_of_residence: Switzerland
-                                        gender: male
-                                    languages:
-                                        [
-                                            {
-                                                name: English,
-                                                proficiency: advanced,
-                                            },
-                                            {
-                                                name: Ukrainian,
-                                                proficiency: native,
-                                            },
-                                        ]
-                                    work_experience:
-                                        [
-                                            {
-                                                job_title: Junior Python Developer,
-                                                location: Zurich,
-                                                company: Tech Studio,
-                                                from_date: "2024-06-01",
-                                                to_date: "2024-09-12",
-                                                description: Developed backend APIs and worked with databases.,
-                                            },
-                                        ]
-                                    scientific_interests:
-                                        [
-                                            {
-                                                name: Artificial Intelligence,
-                                                description: Interested in machine learning and backend automation.,
-                                            },
-                                        ]
-                                    publications:
-                                        [{ title: AI Future, authors: ["me"] }]
-                                    awards:
-                                        [
-                                            {
-                                                title: Best Student Project,
-                                                organization: School,
-                                                date: "2023-05-20",
-                                                description: Won an award for a software development project.,
-                                            },
-                                        ]
-                                    favorite_subjects_in_school:
-                                        [mathematics, computer_science, physics]
-                                    programming_skills:
-                                        [
-                                            {
-                                                language: Python,
-                                                level: advanced,
-                                            },
-                                            {
-                                                language: JavaScript,
-                                                level: intermediate,
-                                            },
-                                        ]
-                                    device_access:
-                                        weekly_hours: 25
-                                    hobbies:
-                                        [
-                                            { name: "Coding" },
-                                            { name: "Football" },
-                                        ]
+
 
                 "400":
                     description: Bad Request
@@ -576,64 +380,7 @@ paths:
                     application/json:
                         schema:
                             $ref: "#/components/schemas/UserCVRequest"
-                        example:
-                            photo: null
-                            personal_info:
-                                first_name: John
-                                last_name: Peterson
-                                email: email@example.com
-                                phone: "+41791234567"
-                                date_of_birth: "2005-04-15"
-                                nationality: Swiss
-                                country_of_residence: Switzerland
-                                gender: male
-                            languages:
-                                [
-                                    { name: English, proficiency: advanced },
-                                    { name: Ukrainian, proficiency: native },
-                                ]
-                            work_experience:
-                                [
-                                    {
-                                        job_title: Junior Python Developer,
-                                        location: Zurich,
-                                        company: Tech Studio,
-                                        from_date: "2024-06-01",
-                                        to_date: "2024-09-12",
-                                        description: Developed backend APIs and worked with databases.,
-                                    },
-                                ]
-                            scientific_interests:
-                                [
-                                    {
-                                        name: Artificial Intelligence,
-                                        description: Interested in machine learning and backend automation.,
-                                    },
-                                ]
-                            publications:
-                                [{ title: AI Future, authors: ["me"] }]
-                            awards:
-                                [
-                                    {
-                                        title: Best Student Project,
-                                        organization: School,
-                                        date: "2023-05-20",
-                                        description: Won an award for a software development project.,
-                                    },
-                                ]
-                            favorite_subjects_in_school:
-                                [mathematics, computer_science, physics]
-                            programming_skills:
-                                [
-                                    { language: Python, level: advanced },
-                                    {
-                                        language: JavaScript,
-                                        level: intermediate,
-                                    },
-                                ]
-                            device_access:
-                                weekly_hours: 25
-                            hobbies: [{ name: "Coding" }, { name: "Football" }]
+
             responses:
                 "201":
                     description: Successful Response
@@ -719,18 +466,21 @@ components:
                     maxLength: 100
                     minLength: 1
                     title: Title
+                    example: "Best Research Paper Award"
                 organization:
                     anyOf:
                         - type: string
                           maxLength: 100
                         - type: "null"
                     title: Organization
+                    example: "International Conference on AI"
                 date:
                     anyOf:
                         - type: string
                           format: date
                         - type: "null"
                     title: Date
+                    example: "2022-11-15"
                 description:
                     anyOf:
                         - type: string
@@ -738,6 +488,7 @@ components:
                           minLength: 10
                         - type: "null"
                     title: Description
+                    example: "Awarded for outstanding contribution to the field of artificial intelligence."
             additionalProperties: false
             type: object
             required:
@@ -749,6 +500,7 @@ components:
                     type: number
                     minimum: 0
                     title: Weekly Hours
+                    example: 10
             additionalProperties: false
             type: object
             required:
@@ -761,6 +513,7 @@ components:
                 - female
                 - other
             title: Gender
+            example: male
         HTTPValidationError:
             properties:
                 detail:
@@ -777,6 +530,7 @@ components:
                     maxLength: 50
                     minLength: 1
                     title: Name
+                    example: "Reading"
             additionalProperties: false
             type: object
             required:
@@ -789,26 +543,31 @@ components:
                     maxLength: 50
                     minLength: 1
                     title: Job Title
+                    example: Software Engineer
                 location:
                     type: string
                     maxLength: 50
                     minLength: 1
                     title: Location
+                    example: New York, USA
                 company:
                     type: string
                     maxLength: 50
                     minLength: 1
                     title: Company
+                    example: TechCorp Inc.
                 from_date:
                     type: string
                     format: date
                     title: From Date
+                    example: "2020-01-01"
                 to_date:
                     anyOf:
                         - type: string
                           format: date
                         - type: "null"
                     title: To Date
+                    example: "2022-12-31"
                 description:
                     anyOf:
                         - type: string
@@ -816,6 +575,7 @@ components:
                           minLength: 10
                         - type: "null"
                     title: Description
+                    example: "Responsible for developing and maintaining software applications."
             additionalProperties: false
             type: object
             required:
@@ -831,6 +591,7 @@ components:
                     maxLength: 30
                     minLength: 1
                     title: Name
+                    example: English
                 proficiency:
                     $ref: "#/components/schemas/ProficiencyLevel"
             additionalProperties: false
@@ -849,6 +610,7 @@ components:
                 - advanced
                 - native
             title: ProficiencyLevel
+            example: native
         ProgrammingLevel:
             type: string
             enum:
@@ -857,6 +619,7 @@ components:
                 - advanced
                 - expert
             title: ProgrammingLevel
+            example: expert
         ProgrammingSkill:
             properties:
                 language:
@@ -864,6 +627,7 @@ components:
                     maxLength: 50
                     minLength: 1
                     title: Language
+                    example: Python
                 level:
                     $ref: "#/components/schemas/ProgrammingLevel"
             additionalProperties: false
@@ -879,28 +643,33 @@ components:
                     maxLength: 200
                     minLength: 1
                     title: Title
+                    example: "A Comprehensive Study on Quantum Computing"
                 journal:
                     anyOf:
                         - type: string
                           maxLength: 100
                         - type: "null"
                     title: Journal
+                    example: "Journal of Quantum Research"
                 publication_date:
                     anyOf:
                         - type: string
                           format: date
                         - type: "null"
                     title: Publication Date
+                    example: "2023-05-15"
                 authors:
                     items:
                         type: string
                     type: array
                     title: Authors
+                    example: ["John Doe", "Jane Smith"]
                 url:
                     anyOf:
                         - type: string
                         - type: "null"
                     title: Url
+                    example: "https://example.com/publication"
             additionalProperties: false
             type: object
             required:
@@ -920,6 +689,7 @@ components:
                 - english
                 - other
             title: SchoolSubject
+            example: mathematics
         ScientificInterest:
             properties:
                 name:
@@ -927,6 +697,7 @@ components:
                     maxLength: 100
                     minLength: 1
                     title: Name
+                    example: "Quantum Mechanics"
                 description:
                     anyOf:
                         - type: string
@@ -934,6 +705,7 @@ components:
                           minLength: 10
                         - type: "null"
                     title: Description
+                    example: "The study of the behavior of matter and energy at the atomic and subatomic levels."
             additionalProperties: false
             type: object
             required:
@@ -944,6 +716,7 @@ components:
                 photo:
                     anyOf:
                         - type: string
+                          example: null
                         - type: "null"
                     title: Photo
                 personal_info:
@@ -1009,11 +782,14 @@ components:
                 id:
                     anyOf:
                         - type: string
+                          example: 507f1f77bcf86cd799439011
                         - type: "null"
+
                     title: Id
                 photo:
                     anyOf:
                         - type: string
+                          example: null
                         - type: "null"
                     title: Photo
                 personal_info:
@@ -1081,11 +857,13 @@ components:
                     maxLength: 20
                     minLength: 1
                     title: First Name
+                    example: John
                 last_name:
                     type: string
                     maxLength: 20
                     minLength: 1
                     title: Last Name
+                    example: Peterson
                 preferred_name:
                     anyOf:
                         - type: string
@@ -1093,29 +871,35 @@ components:
                           minLength: 1
                         - type: "null"
                     title: Preferred Name
+                    example: Johnny
                 email:
                     type: string
                     format: email
                     title: Email
+                    example: example@example.com
                 phone:
                     type: string
                     maxLength: 15
                     minLength: 10
                     title: Phone
+                    example: "+1234567890"
                 date_of_birth:
                     type: string
                     format: date
                     title: Date Of Birth
+                    example: "1990-01-01"
                 nationality:
                     type: string
                     maxLength: 20
                     minLength: 1
                     title: Nationality
+                    example: American
                 country_of_residence:
                     type: string
                     maxLength: 30
                     minLength: 1
                     title: Country Of Residence
+                    example: United States
                 gender:
                     $ref: "#/components/schemas/Gender"
             additionalProperties: false
