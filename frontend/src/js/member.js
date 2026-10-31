@@ -1,6 +1,6 @@
 import { API_URL, FALLBACK_PHOTO, GENDER_LABELS, PROFICIENCY_LABELS, PROGRAMMING_LEVEL_LABELS, SUBJECT_LABELS, } from "./_types.js";
 import { escapeHtml, getAdminApiHeaders, setElementText } from "./_utils.js";
-import { confirmAction, showError as showToastError } from "./notifications.js";
+import { confirmAction, showError as showToastError } from "./_notifications.js";
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
     const cvId = urlParams.get("id");

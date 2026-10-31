@@ -1,6 +1,6 @@
 import { API_URL, } from "./_types.js";
 import { getAdminApiHeaders } from "./_utils.js";
-import { showError, showSuccess } from "./notifications.js";
+import { showError, showSuccess } from "./_notifications.js";
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dukwtlvte/image/upload";
 const CLOUDINARY_PRESET = "ml_default";
 const CLOUDINARY_FOLDER = "cv-project/user-pictures";
