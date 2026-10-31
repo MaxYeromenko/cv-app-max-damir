@@ -8,6 +8,7 @@ import {
     SchoolSubject,
 } from "./_types.js";
 import { getAdminApiHeaders } from "./_utils.js";
+import { showError, showSuccess } from "./notifications.js";
 
 const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dukwtlvte/image/upload";
 const CLOUDINARY_PRESET = "ml_default";
@@ -434,11 +435,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function uploadPhoto(file: File): Promise<string | null> {
         if (!file.type.startsWith("image/")) {
-            alert("The selected file is not an image.");
+            showError("The selected file is not an image.");
             return null;
         }
         if (file.size > 5 * 1024 * 1024) {
-            alert("Photo size must not exceed 5 MB.");
+            showError("Photo size must not exceed 5 MB.");
             return null;
         }
 
@@ -576,7 +577,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!photoUrl) {
                 submitBtn.disabled = false;
                 submitBtn.textContent = cvId ? "Update CV" : "Save CV";
-                window.alert("The photo could not be uploaded. The CV was not saved.");
+                showError("The photo could not be uploaded. The CV was not saved.");
                 return;
             }
         }
@@ -589,11 +590,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.assign(`/member.html?id=${encodeURIComponent(cvId)}`);
                 return;
             }
-            window.alert("CV created successfully.");
+            showSuccess("CV created successfully.");
             form.reset();
         } catch (error) {
             console.error("Error saving CV:", error);
-            window.alert(`Could not save the CV. ${error instanceof Error ? error.message : "Please try again."}`);
+            showError(`Could not save the CV. ${error instanceof Error ? error.message : "Please try again."}`);
         }
 
         submitBtn.disabled = false;

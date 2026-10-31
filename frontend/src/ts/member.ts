@@ -11,6 +11,7 @@ import {
     SchoolSubject,
 } from "./_types.js";
 import { escapeHtml, getAdminApiHeaders, setElementText } from "./_utils.js";
+import { confirmAction, showError as showToastError } from "./notifications.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -33,7 +34,15 @@ document.addEventListener("DOMContentLoaded", () => {
     exportBtn?.addEventListener("click", () => window.print());
 
     deleteBtn?.addEventListener("click", async () => {
-        if (!window.confirm("Delete this CV? This action cannot be undone.")) return;
+        const confirmed = await confirmAction({
+            title: "Delete this CV?",
+            message: "This action cannot be undone. The CV will be permanently removed.",
+            confirmText: "Delete",
+            cancelText: "Cancel",
+            variant: "danger",
+        });
+
+        if (!confirmed) return;
 
         deleteBtn.disabled = true;
         try {
@@ -48,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.assign("/catalog.html");
         } catch (error) {
             console.error("Error deleting CV:", error);
-            window.alert(`Could not delete this CV. ${error instanceof Error ? error.message : "Please try again."}`);
+            showToastError(`Could not delete this CV. ${error instanceof Error ? error.message : "Please try again."}`);
             deleteBtn.disabled = false;
         }
     });
